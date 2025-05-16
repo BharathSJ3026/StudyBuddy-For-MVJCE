@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 15 100% 55%;
+    --color-secondary: 30 100% 55%;
+    --color-accent: 200 100% 55%;
+    --color-success: 142 70% 45%;
+    --color-warning: 38 92% 50%;
+    --color-error: 0 91% 65%;
+    --color-background: 215 28% 17%;
+    --color-card: 217 33% 20%;
+    --color-card-hover: 215 25% 27%;
+    --color-text-primary: 0 0% 100%;
+    --color-text-secondary: 214 32% 91%;
+    --color-text-muted: 214 32% 70%;
+  }
+}
+
+body {
+  @apply bg-background text-text-primary font-sans antialiased;
+  font-feature-settings: "kern";
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-semibold tracking-tight;
+  line-height: 1.2;
+}
+
+p, ul, ol {
+  line-height: 1.5;
+}
+
+.card-hover {
+  @apply transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg;
+}
+
+.button-primary {
+  @apply bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition duration-300 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+}
+
+.button-secondary {
+  @apply bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary/90 transition duration-300 focus:ring-2 focus:ring-secondary/50 focus:outline-none;
+}
+
+.button-accent {
+  @apply bg-accent text-white py-2 px-4 rounded-md hover:bg-accent/90 transition duration-300 focus:ring-2 focus:ring-accent/50 focus:outline-none;
+}
+
+.button-outline {
+  @apply border border-primary text-primary py-2 px-4 rounded-md hover:bg-primary/10 transition duration-300 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+}
+
+.input-field {
+  @apply px-4 py-2 bg-card border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary placeholder-text-muted;
+}
+
+.sidebar-item {
+  @apply flex items-center gap-2 px-4 py-3 rounded-md cursor-pointer transition-colors;
+}
+
+.sidebar-item-active {
+  @apply bg-card-hover text-primary font-medium;
+}
+
+.sidebar-item:not(.sidebar-item-active) {
+  @apply hover:bg-card hover:text-text-secondary;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-card-hover rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/50;
+}
