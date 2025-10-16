@@ -147,3 +147,4 @@ CREATE TRIGGER on_resource_update
   BEFORE UPDATE ON resources
   FOR EACH ROW
   EXECUTE PROCEDURE public.handle_resource_update();
+
