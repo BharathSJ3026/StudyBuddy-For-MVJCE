@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -9,8 +8,10 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import DepartmentsListPage from './pages/DepartmentsListPage';
 import DepartmentPage from './pages/DepartmentPage';
 import ResourcePage from './pages/ResourcePage';
+import QuizGeneratorPage from './pages/QuizGeneratorPage';
 import DiscussionPage from './pages/DiscussionPage';
 import SchedulePage from './pages/SchedulePage';
 import ProfilePage from './pages/ProfilePage';
@@ -48,6 +49,14 @@ function App() {
               }
             />
             <Route
+              path="/departments"
+              element={
+                <ProtectedRoute>
+                  <DepartmentsListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/department/:departmentId"
               element={
                 <ProtectedRoute>
@@ -60,6 +69,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ResourcePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quiz"
+              element={
+                <ProtectedRoute>
+                  <QuizGeneratorPage />
                 </ProtectedRoute>
               }
             />

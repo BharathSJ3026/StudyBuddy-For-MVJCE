@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GraduationCap, BookOpen, Calendar, Users, BookCopy } from 'lucide-react';
+import { GraduationCap, BookOpen, Calendar, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SidebarItem {
@@ -22,7 +22,7 @@ const defaultItems: SidebarItem[] = [
   {
     title: 'Resources',
     icon: <BookOpen className="w-5 h-5" />,
-    path: '/resources',
+    path: '/departments',
   },
   {
     title: 'Schedule',
@@ -33,11 +33,6 @@ const defaultItems: SidebarItem[] = [
     title: 'Discussions',
     icon: <Users className="w-5 h-5" />,
     path: '/discussions',
-  },
-  {
-    title: 'Question Papers',
-    icon: <BookCopy className="w-5 h-5" />,
-    path: '/question-papers',
   },
 ];
 

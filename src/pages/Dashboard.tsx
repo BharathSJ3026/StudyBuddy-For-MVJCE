@@ -1,212 +1,128 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, FileText, BookOpen } from 'lucide-react';
+import { BookOpen, Brain, Calendar } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { useSupabase } from '../contexts/SupabaseContext';
 
-interface Department {
-  id: string;
-  name: string;
-  description: string;
-}
-
-interface QuestionPaper {
-  id: string;
-  year: number;
-  title: string;
-  file_url: string;
-  created_at: string;
-}
-
-interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  created_at: string;
-}
 
 const Dashboard: React.FC = () => {
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [questionPapers, setQuestionPapers] = useState<QuestionPaper[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  const { supabase } = useSupabase();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Fetch departments
-        const { data: deptData, error: deptError } = await supabase
-          .from('departments')
-          .select('*')
-          .order('name');
-        
-        if (deptError) throw deptError;
-        setDepartments(deptData || []);
-
-        // Fetch recent question papers
-        const { data: paperData, error: paperError } = await supabase
-          .from('question_papers')
-          .select(`
-            id,
-            year,
-            title,
-            file_url,
-            created_at
-          `)
-          .order('created_at', { ascending: false })
-          .limit(4);
-        
-        if (paperError) throw paperError;
-        setQuestionPapers(paperData || []);
-
-        // Fetch recent announcements (you'll need to create this table)
-        const { data: announceData, error: announceError } = await supabase
-          .from('announcements')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(3);
-        
-        if (announceError) throw announceError;
-        setAnnouncements(announceData || []);
-
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [supabase]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        when: "beforeChildren",
-        staggerChildren: 0.1
-      }
-    }
-  };
-
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
       y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
+      transition: { duration: 0.5 }
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center h-screen">
-          <LoadingSpinner size="large" />
-        </div>
-      </div>
-    );
-  }
+  const features = [
+    {
+      icon: <BookOpen className="w-12 h-12" />,
+      title: "Notes",
+      description: "Access comprehensive notes for all VTU engineering courses organized by department and semester",
+      buttonText: "Browse Notes",
+      buttonColor: "bg-purple-600 hover:bg-purple-700",
+      iconColor: "text-purple-600",
+      iconBg: "bg-purple-100",
+      link: "/departments"
+    },
+    {
+      icon: <Brain className="w-12 h-12" />,
+      title: "Quiz Generator",
+      description: "Generate custom quizzes based on your course materials to test your knowledge and prepare for exams",
+      buttonText: "Create Quiz",
+      buttonColor: "bg-cyan-600 hover:bg-cyan-700",
+      iconColor: "text-cyan-600",
+      iconBg: "bg-cyan-100",
+      link: "/quiz"
+    },
+    {
+      icon: <Calendar className="w-12 h-12" />,
+      title: "TimeTable Scheduler",
+      description: "Organize your study schedule, track assignments, and manage your academic calendar efficiently",
+      buttonText: "Manage Schedule",
+      buttonColor: "bg-cyan-600 hover:bg-cyan-700",
+      iconColor: "text-cyan-600",
+      iconBg: "bg-cyan-100",
+      link: "/schedule"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-6">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-        >
-          {/* Departments Section */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
-            <div className="bg-card rounded-lg shadow-md p-5">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <BookOpen className="w-5 h-5 mr-2 text-primary" />
-                Departments
-              </h2>
-              <p className="text-text-secondary text-sm mb-4">Access the notes</p>
-              
-              <div className="space-y-2">
-                {departments.map((dept) => (
-                  <Link 
-                    key={dept.id}
-                    to={`/department/${dept.id}`}
-                    className="block p-3 bg-card-hover rounded-md hover:bg-opacity-80 transition-colors"
-                  >
-                    {dept.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+      
+      {/* Hero Section */}
+      <motion.section 
+        className="pt-16 pb-12 px-4 sm:px-6 lg:px-8 bg-card"
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.h1 
+            variants={itemVariants}
+            className="text-4xl md:text-5xl font-bold mb-4 text-text-primary"
+          >
+            Welcome to StudyBuddy
+          </motion.h1>
+          
+          <motion.p 
+            variants={itemVariants}
+            className="text-lg text-text-secondary max-w-3xl mx-auto mb-12"
+          >
+            Your comprehensive platform for VTU engineering studies. Access notes, generate quizzes, and manage your schedule all in one place.
+          </motion.p>
+        </div>
+      </motion.section>
 
-          {/* Main Content - Previous Year Papers */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
-            <div className="bg-card rounded-lg shadow-md p-5">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-primary" />
-                Recent Question Papers
-              </h2>
-              
-              <div className="grid grid-cols-1 gap-4">
-                {questionPapers.map((paper) => (
-                  <Link 
-                    key={paper.id}
-                    to={paper.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-4 bg-card-hover rounded-md hover:bg-opacity-80 transition-colors"
-                  >
-                    <h3 className="font-medium mb-2">{paper.title}</h3>
-                    <p className="text-text-secondary text-sm">Year: {paper.year}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+      {/* Features Section */}
+      <section className="pb-12 px-4 sm:px-6 lg:px-8 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                className="bg-card rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <div className={`${feature.iconBg} ${feature.iconColor} w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-6`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-text-primary">{feature.title}</h3>
+                <p className="text-text-secondary text-sm mb-6 leading-relaxed min-h-[80px]">
+                  {feature.description}
+                </p>
+                <Link 
+                  to={feature.link}
+                  className={`${feature.buttonColor} text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 inline-block w-full`}
+                >
+                  {feature.buttonText}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          {/* What's New Section */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
-            <div className="bg-card rounded-lg shadow-md p-5">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <Calendar className="w-5 h-5 mr-2 text-primary" />
-                What's New?
-              </h2>
-              
-              <div className="space-y-4">
-                {announcements.map((announcement) => {
-                  const date = new Date(announcement.created_at);
-                  const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
-                  
-                  return (
-                    <div 
-                      key={announcement.id}
-                      className="p-4 bg-card-hover rounded-md"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-medium">{announcement.title}</h3>
-                        <p className="text-text-muted text-xs flex items-center">
-                          <Clock className="w-3 h-3 mr-1" /> {daysAgo} days ago
-                        </p>
-                      </div>
-                      <p className="text-text-secondary line-clamp-3">{announcement.content}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+      {/* Student Resources Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-card">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="bg-card-hover rounded-2xl p-10 text-center shadow-xl"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold mb-4 text-text-primary">Student Resources</h2>
+            <p className="text-lg text-text-secondary leading-relaxed">
+              Access all your study materials, create personalized quizzes, and stay organized with our scheduling tools.
+            </p>
           </motion.div>
-        </motion.div>
-      </main>
+        </div>
+      </section>
     </div>
   );
 };
