@@ -34,6 +34,35 @@ p, ul, ol {
   line-height: 1.5;
 }
 
+/* Form input overrides for light theme */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+textarea,
+select {
+  @apply text-black bg-white border-gray-300;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="url"]::placeholder,
+input[type="number"]::placeholder,
+input[type="search"]::placeholder,
+input[type="tel"]::placeholder,
+textarea::placeholder {
+  @apply text-gray-500;
+}
+
+/* Ensure form labels are visible */
+label {
+  @apply text-gray-700;
+}
+
 .card-hover {
   @apply transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg;
 }

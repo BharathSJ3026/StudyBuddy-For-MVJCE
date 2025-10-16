@@ -277,3 +277,29 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- Set up storage policies
+create policy "Public Access"
+  on storage.objects for select
+  using ( bucket_id = 'study-resources' );
+
+create policy "Authenticated users can upload files"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'study-resources'
+    and auth.role() = 'authenticated'
+  );
+
+create policy "Users can update their own files"
+  on storage.objects for update
+  using (
+    bucket_id = 'study-resources'
+    and auth.uid() = owner
+  );
+
+create policy "Users can delete their own files"
+  on storage.objects for delete
+  using (
+    bucket_id = 'study-resources'
+    and auth.uid() = owner
+  );
