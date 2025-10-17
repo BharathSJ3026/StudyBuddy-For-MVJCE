@@ -5,6 +5,7 @@ import Navbar from '../components/layout/Navbar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSupabase } from '../contexts/SupabaseContext';
 import toast from 'react-hot-toast';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface Department {
   id: string;
@@ -109,57 +110,37 @@ const QuizGeneratorPage: React.FC = () => {
         throw new Error('API key not configured');
       }
 
-      console.log('Using API endpoint with key:', apiKey.substring(0, 10) + '...');
+      console.log('Using Gemini API with key:', apiKey.substring(0, 10) + '...');
 
-      // Call Gemini API - Using v1 API with gemini-1.5-pro model
-      const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
-      console.log('Calling API URL:', apiUrl.replace(apiKey, 'API_KEY_HIDDEN'));
+      // Initialize Google Generative AI
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Generate ${numberOfQuestions} multiple choice questions for the subject "${selectedCourseData.name}" (${selectedCourseData.code}) with ${difficulty} difficulty level. 
+      const prompt = `Generate ${numberOfQuestions} multiple choice questions for the subject "${selectedCourseData.name}" (${selectedCourseData.code}) with ${difficulty} difficulty level. 
               
-              Format the response as a JSON array of objects with this exact structure:
-              [
-                {
-                  "question": "Question text here?",
-                  "options": ["Option A", "Option B", "Option C", "Option D"],
-                  "correctAnswer": 0,
-                  "explanation": "Brief explanation of the correct answer"
-                }
-              ]
-              
-              Rules:
-              - correctAnswer should be the index (0-3) of the correct option
-              - Each question should have exactly 4 options
-              - Questions should be relevant to the subject
-              - Difficulty: ${difficulty === 'easy' ? 'Basic concepts and definitions' : difficulty === 'medium' ? 'Application and analysis' : 'Advanced problem-solving and critical thinking'}
-              - Return ONLY the JSON array, no additional text`
-            }]
-          }]
-        })
-      });
+Format the response as a JSON array of objects with this exact structure:
+[
+  {
+    "question": "Question text here?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctAnswer": 0,
+    "explanation": "Brief explanation of the correct answer"
+  }
+]
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('API Error Response:', errorData);
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-      }
+Rules:
+- correctAnswer should be the index (0-3) of the correct option
+- Each question should have exactly 4 options
+- Questions should be relevant to the subject
+- Difficulty: ${difficulty === 'easy' ? 'Basic concepts and definitions' : difficulty === 'medium' ? 'Application and analysis' : 'Advanced problem-solving and critical thinking'}
+- Return ONLY the JSON array, no additional text`;
 
-      const data = await response.json();
-      console.log('API Response:', data);
-
-      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-        throw new Error('Invalid response format from API');
-      }
-
-      const generatedText = data.candidates[0].content.parts[0].text;
+      console.log('Generating content with Gemini 2.0 Flash...');
+      const result = await model.generateContent(prompt);
+      const response = result.response;
+      const generatedText = response.text();
+      
+      console.log('Generated text:', generatedText);
       
       // Extract JSON from the response (sometimes Gemini wraps it in markdown code blocks)
       let jsonText = generatedText.trim();
@@ -247,20 +228,52 @@ const QuizGeneratorPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex items-center justify-center h-screen">
-          <LoadingSpinner size="large" />
+      <div className="min-h-screen w-full bg-[#0f172a] relative">
+        {/* Dark Grid with White Dots Background */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background: "#0f172a",
+            backgroundImage: `
+              linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px),
+              radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)
+            `,
+            backgroundSize: "20px 20px, 20px 20px, 20px 20px",
+            backgroundPosition: "0 0, 0 0, 0 0",
+          }}
+        />
+        <div className="relative z-10">
+          <Navbar />
+          <div className="flex items-center justify-center h-screen">
+            <LoadingSpinner size="large" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className="min-h-screen w-full bg-[#0f172a] relative">
+      {/* Dark Grid with White Dots Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          background: "#0f172a",
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)
+          `,
+          backgroundSize: "20px 20px, 20px 20px, 20px 20px",
+          backgroundPosition: "0 0, 0 0, 0 0",
+        }}
+      />
       
-      <main className="container mx-auto px-4 py-8">
+      <div className="relative z-10">
+        <Navbar />
+        
+        <main className="container mx-auto px-4 py-8">
         {!quizStarted ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -279,7 +292,7 @@ const QuizGeneratorPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-card rounded-lg p-8 shadow-lg">
+            <div className="bg-card/80 backdrop-blur-md rounded-lg p-8 shadow-lg border border-white/10">
               <form onSubmit={(e) => { e.preventDefault(); generateQuiz(); }} className="space-y-6">
                 {/* Department Selection */}
                 <div>
@@ -378,19 +391,23 @@ const QuizGeneratorPage: React.FC = () => {
                 {/* Number of Questions */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-text-primary">
-                    Number of Questions: {numberOfQuestions}
+                    Number of Questions
                   </label>
-                  <input
-                    type="range"
-                    min="5"
-                    max="20"
-                    value={numberOfQuestions}
-                    onChange={(e) => setNumberOfQuestions(parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-text-muted mt-1">
-                    <span>5</span>
-                    <span>20</span>
+                  <div className="grid grid-cols-4 gap-3">
+                    {[5, 10, 15, 20].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setNumberOfQuestions(num)}
+                        className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                          numberOfQuestions === num
+                            ? 'bg-primary text-white'
+                            : 'bg-card-hover text-text-secondary hover:bg-primary/20'
+                        }`}
+                      >
+                        {num}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -597,6 +614,7 @@ const QuizGeneratorPage: React.FC = () => {
           </motion.div>
         )}
       </main>
+      </div>
     </div>
   );
 };

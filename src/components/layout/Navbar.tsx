@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, LogOut, Menu, X } from 'lucide-react';
+import { User, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Logo from '../ui/Logo';
 import { motion } from 'framer-motion';
@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="bg-card shadow-md py-3 px-4 md:px-6">
+    <header className="bg-card/30 backdrop-blur-md shadow-md py-3 px-4 md:px-6 border-b border-white/10">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <Link to="/dashboard" className="mr-6">
@@ -61,15 +61,6 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center bg-card-hover rounded-md px-3 py-1.5">
-            <Search className="w-5 h-5 text-text-muted" />
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="bg-transparent border-none outline-none ml-2 w-48 lg:w-64 text-sm placeholder:text-text-muted"
-            />
-          </div>
 
           {/* Profile Menu */}
           {user && (
@@ -132,14 +123,6 @@ const Navbar: React.FC = () => {
           transition={{ duration: 0.2 }}
           className="md:hidden mt-2 py-2"
         >
-          <div className="flex items-center bg-card-hover rounded-md px-3 py-2 mx-2 mb-2">
-            <Search className="w-5 h-5 text-text-muted" />
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="bg-transparent border-none outline-none ml-2 w-full text-sm placeholder:text-text-muted"
-            />
-          </div>
           <Link 
             to="/dashboard" 
             className="block py-2 px-4 text-text-secondary hover:bg-card-hover transition-colors"
