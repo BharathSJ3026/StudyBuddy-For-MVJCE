@@ -1,11 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, Brain, Calendar } from 'lucide-react';
+import { BookOpen, Brain, Calendar, Shield, Activity, Terminal, Lock, Cpu, Wifi, Clock, ArrowRight, ChevronRight } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 
-
 const Dashboard: React.FC = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -17,112 +26,256 @@ const Dashboard: React.FC = () => {
 
   const features = [
     {
-      icon: <BookOpen className="w-12 h-12" />,
+      icon: <BookOpen className="w-8 h-8" />,
       title: "Notes",
+      subtitle: "Study Materials",
       description: "Access comprehensive notes for all VTU engineering courses organized by department and semester",
       buttonText: "Browse Notes",
-      buttonColor: "bg-purple-600 hover:bg-purple-700",
-      iconColor: "text-purple-600",
-      iconBg: "bg-purple-100",
+      accentColor: "cyan",
       link: "/departments"
     },
     {
-      icon: <Brain className="w-12 h-12" />,
+      icon: <Brain className="w-8 h-8" />,
       title: "Quiz Generator",
+      subtitle: "Test Knowledge",
       description: "Generate custom quizzes based on your course materials to test your knowledge and prepare for exams",
       buttonText: "Create Quiz",
-      buttonColor: "bg-cyan-600 hover:bg-cyan-700",
-      iconColor: "text-cyan-600",
-      iconBg: "bg-cyan-100",
+      accentColor: "green",
       link: "/quiz"
     },
     {
-      icon: <Calendar className="w-12 h-12" />,
+      icon: <Calendar className="w-8 h-8" />,
       title: "TimeTable Scheduler",
+      subtitle: "Manage Time",
       description: "Organize your study schedule, track assignments, and manage your academic calendar efficiently",
       buttonText: "Manage Schedule",
-      buttonColor: "bg-cyan-600 hover:bg-cyan-700",
-      iconColor: "text-cyan-600",
-      iconBg: "bg-cyan-100",
+      accentColor: "purple",
       link: "/schedule"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30">
+      {/* Cyber Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
+           style={{ 
+             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
+             backgroundSize: '40px 40px' 
+           }}>
+      </div>
       
-      {/* Hero Section */}
-      <motion.section 
-        className="pt-16 pb-12 px-4 sm:px-6 lg:px-8 bg-card"
-        initial="hidden"
-        animate="visible"
-      >
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h1 
-            variants={itemVariants}
-            className="text-4xl md:text-5xl font-bold mb-4 text-text-primary"
-          >
-            Welcome to StudyBuddy
-          </motion.h1>
-          
-          <motion.p 
-            variants={itemVariants}
-            className="text-lg text-text-secondary max-w-3xl mx-auto mb-12"
-          >
-            Your comprehensive platform for VTU engineering studies. Access notes, generate quizzes, and manage your schedule all in one place.
-          </motion.p>
-        </div>
-      </motion.section>
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
 
-      {/* Features Section */}
-      <section className="pb-12 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                className="bg-card rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div className={`${feature.iconBg} ${feature.iconColor} w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-6`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-text-primary">{feature.title}</h3>
-                <p className="text-text-secondary text-sm mb-6 leading-relaxed min-h-[80px]">
-                  {feature.description}
-                </p>
-                <Link 
-                  to={feature.link}
-                  className={`${feature.buttonColor} text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300 inline-block w-full`}
+      <div className="relative z-10">
+        <Navbar />
+        
+        {/* Header Section */}
+        <motion.section 
+          className="pt-36 pb-12 px-4 sm:px-6 lg:px-8"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-end border-b border-cyan-500/30 pb-6 mb-12">
+              <div>
+                <motion.div variants={itemVariants} className="flex items-center gap-2 text-cyan-400 mb-2">
+                  <Shield className="w-5 h-5" />
+                  <span className="text-xs tracking-[0.2em]">SECURE CONNECTION ESTABLISHED</span>
+                </motion.div>
+                <motion.h1 
+                  variants={itemVariants}
+                  className="text-4xl md:text-6xl font-bold text-white tracking-tighter uppercase glitch-text"
+                  style={{ textShadow: '0 0 10px rgba(6,182,212,0.5)' }}
                 >
-                  {feature.buttonText}
-                </Link>
+                  Welcome to StudyBuddy
+                </motion.h1>
+                <motion.p 
+                  variants={itemVariants}
+                  className="text-lg text-slate-400 max-w-3xl mt-4"
+                >
+                  Your comprehensive platform for VTU engineering studies. Access notes, generate quizzes, and manage your schedule all in one place.
+                </motion.p>
+              </div>
+              <motion.div variants={itemVariants} className="flex items-center gap-4 mt-4 md:mt-0 text-xs text-slate-400">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span>SYSTEM ONLINE</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Wifi className="w-4 h-4" />
+                  <span>LATENCY: 12ms</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-4 h-4" />
+                  <span>CPU: OPTIMAL</span>
+                </div>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
 
-      {/* Student Resources Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-card">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            className="bg-card-hover rounded-2xl p-10 text-center shadow-xl"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl font-bold mb-4 text-text-primary">Student Resources</h2>
-            <p className="text-lg text-text-secondary leading-relaxed">
-              Access all your study materials, create personalized quizzes, and stay organized with our scheduling tools.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+            {/* Stats Row */}
+            <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+              {[
+                { label: "ACTIVE STUDENTS", value: "1,248", icon: <Activity className="w-4 h-4 text-green-400" /> },
+                { label: "TOTAL RESOURCES", value: "8,502", icon: <Terminal className="w-4 h-4 text-cyan-400" /> },
+                { label: "DEPARTMENTS", value: "8", icon: <BookOpen className="w-4 h-4 text-purple-400" /> },
+                { label: "DAILY DOWNLOADS", value: "450+", icon: <Cpu className="w-4 h-4 text-blue-400" /> },
+              ].map((stat, i) => (
+                <div key={i} className="bg-slate-900/50 border border-slate-800 p-4 rounded-sm backdrop-blur-sm hover:border-cyan-500/30 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[10px] text-slate-500 tracking-widest">{stat.label}</span>
+                    {stat.icon}
+                  </div>
+                  <div className="text-2xl font-bold text-slate-200 font-mono">{stat.value}</div>
+                </div>
+              ))}
+            </motion.div>
+            
+            {/* Main Modules Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="group relative bg-slate-900/80 border border-slate-800 hover:border-cyan-500/50 transition-all duration-300 overflow-hidden rounded-sm flex flex-col"
+                >
+                  {/* Corner Accents */}
+                  <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                  {/* Animated Scanline */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000 ease-in-out pointer-events-none"></div>
+
+                  <div className="p-8 relative z-10 flex flex-col h-full">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className={`w-14 h-14 rounded-sm flex items-center justify-center bg-slate-950 border border-${feature.accentColor}-500/30 group-hover:border-${feature.accentColor}-500 group-hover:shadow-[0_0_15px_rgba(var(--${feature.accentColor}-rgb),0.3)] transition-all duration-300`}>
+                        <div className={`text-${feature.accentColor}-400 group-hover:scale-110 transition-transform duration-300`}>
+                          {feature.icon}
+                        </div>
+                      </div>
+                      <div className={`text-[10px] font-bold px-2 py-1 bg-${feature.accentColor}-500/10 text-${feature.accentColor}-400 border border-${feature.accentColor}-500/20 rounded-sm uppercase tracking-wider`}>
+                        Module_0{index + 1}
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-white mb-1 tracking-wide group-hover:text-cyan-400 transition-colors">{feature.title}</h3>
+                    <div className={`text-xs text-${feature.accentColor}-400 mb-4 tracking-widest uppercase flex items-center gap-2`}>
+                      <span className={`w-2 h-2 rounded-full bg-${feature.accentColor}-500 animate-pulse`}></span>
+                      {feature.subtitle}
+                    </div>
+                    
+                    <p className="text-slate-400 text-sm mb-8 leading-relaxed border-l-2 border-slate-800 pl-4 group-hover:border-cyan-500/30 transition-colors flex-grow">
+                      {feature.description}
+                    </p>
+                    
+                    <Link 
+                      to={feature.link}
+                      className={`relative overflow-hidden inline-flex items-center justify-center w-full py-3 px-4 bg-slate-950 border border-slate-700 hover:border-${feature.accentColor}-500 text-slate-300 hover:text-${feature.accentColor}-400 text-sm font-bold tracking-widest uppercase transition-all duration-300 group-hover:shadow-[0_0_10px_rgba(0,0,0,0.5)]`}
+                    >
+                      <span className="relative z-10 flex items-center">
+                        {feature.buttonText}
+                        <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                      <div className={`absolute inset-0 bg-${feature.accentColor}-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300`}></div>
+                    </Link>
+                  </div>
+                  
+                  {/* Background Hover Effect */}
+                  <div className={`absolute inset-0 bg-gradient-to-br from-${feature.accentColor}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Upcoming Events Section */}
+            <motion.div 
+              variants={itemVariants}
+              className="mb-16"
+            >
+              <div className="flex justify-between items-end mb-6 border-b border-slate-800 pb-2">
+                <div>
+                  <h2 className="text-2xl font-bold text-white uppercase tracking-widest flex items-center gap-3">
+                    <Calendar className="w-6 h-6 text-cyan-500" />
+                    Upcoming Events
+                  </h2>
+                  <p className="text-slate-500 text-xs mt-1 tracking-wider">SCHEDULED PROTOCOLS & ASSIGNMENTS</p>
+                </div>
+                <Link to="/schedule" className="text-cyan-500 hover:text-cyan-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
+                  View Full Schedule <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { title: "Database Systems Lecture", date: "AUG 10", time: "10:00 HRS", type: "CLASS", color: "blue" },
+                  { title: "Data Structures Assignment", date: "AUG 12", time: "23:59 HRS", type: "DEADLINE", color: "yellow" },
+                  { title: "Machine Learning Exam", date: "AUG 15", time: "14:00 HRS", type: "EXAM", color: "red" }
+                ].map((event, i) => (
+                  <Link to="/schedule" key={i} className="group block">
+                    <div className="bg-slate-900/50 border border-slate-800 hover:border-cyan-500/50 p-5 rounded-sm transition-all duration-300 hover:bg-slate-900 hover:translate-y-[-2px] relative overflow-hidden">
+                      <div className={`absolute top-0 left-0 w-1 h-full bg-${event.color}-500`}></div>
+                      <div className="flex justify-between items-start mb-3">
+                        <span className={`text-[10px] font-bold px-2 py-1 bg-${event.color}-500/10 text-${event.color}-400 rounded-sm uppercase`}>
+                          {event.type}
+                        </span>
+                        <span className="text-slate-500 text-xs font-mono">{event.date}</span>
+                      </div>
+                      <h4 className="text-white font-bold mb-2 group-hover:text-cyan-400 transition-colors truncate">{event.title}</h4>
+                      <div className="flex items-center text-slate-500 text-xs font-mono">
+                        <Clock className="w-3 h-3 mr-2" />
+                        {event.time}
+                      </div>
+                      <div className="absolute bottom-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ArrowRight className="w-4 h-4 text-cyan-500 -rotate-45" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </motion.section>
+
+        {/* System Log Section */}
+        <section className="pb-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              className="bg-black/40 border border-slate-800 p-6 font-mono text-xs md:text-sm text-slate-500"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-2">
+                <Terminal className="w-4 h-4" />
+                <span className="text-cyan-500">SYSTEM_LOG</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex gap-4">
+                  <span className="text-slate-600">[10:42:05]</span>
+                  <span>Initializing user interface protocols...</span>
+                  <span className="text-green-500">DONE</span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-slate-600">[10:42:06]</span>
+                  <span>Loading resource database...</span>
+                  <span className="text-green-500">DONE</span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-slate-600">[10:42:08]</span>
+                  <span>Checking security parameters...</span>
+                  <span className="text-green-500">SECURE</span>
+                </div>
+                <div className="flex gap-4">
+                  <span className="text-slate-600">[10:42:09]</span>
+                  <span className="animate-pulse text-cyan-400">Waiting for user input_</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

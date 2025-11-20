@@ -1,170 +1,135 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Menu, X } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { User, LogOut, Menu, X, Shield, Home, MessageSquare, Calendar } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import Logo from '../ui/Logo';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const isActive = (path: string) => location.pathname === path;
 
-  const toggleProfileMenu = () => {
-    setIsProfileMenuOpen(!isProfileMenuOpen);
-  };
-
-  const menuVariants = {
-    closed: { opacity: 0, y: -20 },
-    open: { opacity: 1, y: 0 }
-  };
+  const navItems = [
+    { path: '/dashboard', label: 'HOME', icon: <Home className="w-4 h-4" /> },
+    { path: '/discussions', label: 'DISCUSSIONS', icon: <MessageSquare className="w-4 h-4" /> },
+    { path: '/schedule', label: 'SCHEDULE', icon: <Calendar className="w-4 h-4" /> },
+  ];
 
   return (
-    <header className="bg-card/30 backdrop-blur-md shadow-md py-3 px-4 md:px-6 border-b border-white/10">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center">
-          <Link to="/dashboard" className="mr-6">
-            <Logo />
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              to="/dashboard" 
-              className="text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Home
-            </Link>
-            <Link 
-              to="/discussions" 
-              className="text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Discussions
-            </Link>
-            <Link 
-              to="/schedule" 
-              className="text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Schedule
-            </Link>
-          </nav>
-        </div>
-
-        <div className="flex items-center space-x-4">
-
-          {/* Profile Menu */}
-          {user && (
-            <div className="relative">
-              <button 
-                onClick={toggleProfileMenu}
-                className="flex items-center space-x-2 hover:bg-card-hover rounded-full p-1 transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-card-hover flex items-center justify-center">
-                  <User className="w-5 h-5 text-text-primary" />
-                </div>
-              </button>
-
-              {isProfileMenuOpen && (
-                <motion.div 
-                  initial="closed"
-                  animate="open"
-                  variants={menuVariants}
-                  transition={{ duration: 0.2 }}
-                  className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-50"
-                >
-                  <Link 
-                    to="/profile" 
-                    className="block px-4 py-2 text-text-secondary hover:bg-card-hover transition-colors"
-                    onClick={() => setIsProfileMenuOpen(false)}
-                  >
-                    Profile Settings
-                  </Link>
-                  <button 
-                    onClick={handleSignOut}
-                    className="w-full text-left px-4 py-2 text-text-secondary hover:bg-card-hover transition-colors flex items-center"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" /> Sign Out
-                  </button>
-                </motion.div>
-              )}
-            </div>
-          )}
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-1 rounded-md hover:bg-card-hover transition-colors"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 text-text-primary" />
-            ) : (
-              <Menu className="w-6 h-6 text-text-primary" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
+    <>
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-2xl">
         <motion.nav 
-          initial="closed"
-          animate="open"
-          variants={menuVariants}
-          transition={{ duration: 0.2 }}
-          className="md:hidden mt-2 py-2"
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 rounded-full px-2 py-2 shadow-[0_0_20px_rgba(6,182,212,0.15)] flex items-center justify-between relative overflow-hidden"
         >
-          <Link 
-            to="/dashboard" 
-            className="block py-2 px-4 text-text-secondary hover:bg-card-hover transition-colors"
-            onClick={toggleMenu}
-          >
-            Home
+          {/* Scanline effect */}
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(6,182,212,0.1),transparent)] translate-x-[-100%] animate-[shimmer_3s_infinite]"></div>
+
+          {/* Logo */}
+          <Link to="/dashboard" className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-950/50 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-slate-950 transition-all duration-300 ml-1">
+            <Shield className="w-5 h-5" />
           </Link>
-          <Link 
-            to="/discussions" 
-            className="block py-2 px-4 text-text-secondary hover:bg-card-hover transition-colors"
-            onClick={toggleMenu}
-          >
-            Discussions
-          </Link>
-          <Link 
-            to="/schedule" 
-            className="block py-2 px-4 text-text-secondary hover:bg-card-hover transition-colors"
-            onClick={toggleMenu}
-          >
-            Schedule
-          </Link>
-          <Link 
-            to="/profile" 
-            className="block py-2 px-4 text-text-secondary hover:bg-card-hover transition-colors"
-            onClick={toggleMenu}
-          >
-            Profile Settings
-          </Link>
-          {user && (
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <Link key={item.path} to={item.path}>
+                <div className={`relative px-5 py-2 rounded-full text-xs font-bold font-mono transition-all duration-300 flex items-center gap-2 ${
+                  isActive(item.path) 
+                    ? 'text-slate-950' 
+                    : 'text-slate-400 hover:text-cyan-400'
+                }`}>
+                  {isActive(item.path) && (
+                    <motion.div
+                      layoutId="navbar-active"
+                      className="absolute inset-0 bg-cyan-500 rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    {item.icon}
+                    {item.label}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile Menu Toggle & Profile */}
+          <div className="flex items-center gap-2 mr-1">
+            {user ? (
+              <Link to="/profile" className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition-all overflow-hidden">
+                {user.user_metadata?.avatar_url ? (
+                  <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
+              </Link>
+            ) : (
+              <Link to="/login" className="px-4 py-2 rounded-full bg-cyan-900/20 border border-cyan-500/30 text-cyan-400 text-xs font-bold hover:bg-cyan-500 hover:text-slate-950 transition-all">
+                LOGIN
+              </Link>
+            )}
+
             <button 
-              onClick={() => {
-                handleSignOut();
-                toggleMenu();
-              }}
-              className="w-full text-left py-2 px-4 text-error hover:bg-card-hover transition-colors flex items-center"
+              className="md:hidden w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-cyan-400"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <LogOut className="w-4 h-4 mr-2" /> Sign Out
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-          )}
+          </div>
         </motion.nav>
-      )}
-    </header>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="absolute top-full left-0 right-0 mt-2 bg-slate-950/90 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-4 shadow-xl overflow-hidden"
+            >
+              <div className="flex flex-col space-y-2">
+                {navItems.map((item) => (
+                  <Link 
+                    key={item.path} 
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`p-3 rounded-xl flex items-center gap-3 transition-all ${
+                      isActive(item.path) 
+                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' 
+                        : 'text-slate-400 hover:bg-slate-900 hover:text-cyan-400'
+                    }`}
+                  >
+                    {item.icon}
+                    <span className="font-mono font-bold text-sm">{item.label}</span>
+                  </Link>
+                ))}
+                {user && (
+                  <button 
+                    onClick={() => { handleSignOut(); setIsMenuOpen(false); }}
+                    className="p-3 rounded-xl flex items-center gap-3 text-red-400 hover:bg-red-900/20 transition-all mt-2 border border-transparent hover:border-red-500/30"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="font-mono font-bold text-sm">LOGOUT</span>
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   );
 };
 

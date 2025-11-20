@@ -51,43 +51,58 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30 p-4">
+      {/* Cyber Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
+           style={{ 
+             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
+             backgroundSize: '40px 40px' 
+           }}>
+      </div>
+      
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
+
+      <div className="w-full max-w-md relative z-10">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="flex flex-col items-center mb-8"
         >
-          <div className="flex items-center justify-center mb-2">
-            <div className="rounded-full bg-gradient-to-r from-primary to-secondary p-3">
-              <Book className="h-8 w-8 text-white" />
+          <div className="flex items-center justify-center mb-4">
+            <div className="border border-cyan-500/50 bg-slate-900/80 p-3 shadow-[0_0_15px_rgba(6,182,212,0.3)] relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-0.5 bg-cyan-500"></div>
+              <Book className="h-8 w-8 text-cyan-400" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-center mb-1">Create Your Account</h1>
-          <p className="text-text-secondary text-center">Join Study Buddy Today!</p>
+          <h1 className="text-3xl font-bold text-center mb-1 text-white uppercase tracking-widest glitch-text" data-text="Create Your Account">Create Your Account</h1>
+          <p className="text-cyan-500/80 text-center uppercase tracking-wider text-sm">Join Study Buddy Today!</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-card rounded-lg shadow-lg p-8"
+          className="bg-slate-900/80 border border-slate-800 rounded-sm shadow-lg p-8 relative overflow-hidden"
         >
+          <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+          
           {error && (
-            <div className="mb-4 p-3 bg-error/10 border border-error/30 text-error rounded-md text-sm">
+            <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 text-red-400 rounded-sm text-sm font-mono">
+              <span className="font-bold mr-2">[ERROR]:</span>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="username" className="block text-sm font-medium text-text-secondary">
+              <label htmlFor="username" className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Username
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-text-muted" />
+                  <User className="h-5 w-5 text-slate-600 group-focus-within:text-cyan-500 transition-colors" />
                 </div>
                 <input
                   id="username"
@@ -95,8 +110,8 @@ const Register: React.FC = () => {
                   type="text"
                   autoComplete="username"
                   required
-                  placeholder="Enter your username"
-                  className="input-field pl-10 w-full"
+                  placeholder="ENTER YOUR USERNAME"
+                  className="w-full pl-10 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700 transition-all"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -104,12 +119,12 @@ const Register: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-text-secondary">
+              <label htmlFor="email" className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Email Address
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-text-muted" />
+                  <Mail className="h-5 w-5 text-slate-600 group-focus-within:text-cyan-500 transition-colors" />
                 </div>
                 <input
                   id="email"
@@ -117,8 +132,8 @@ const Register: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="Enter your email ID"
-                  className="input-field pl-10 w-full"
+                  placeholder="ENTER YOUR EMAIL ID"
+                  className="w-full pl-10 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700 transition-all"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -126,12 +141,12 @@ const Register: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-text-secondary">
+              <label htmlFor="password" className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Password
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-text-muted" />
+                  <Lock className="h-5 w-5 text-slate-600 group-focus-within:text-cyan-500 transition-colors" />
                 </div>
                 <input
                   id="password"
@@ -139,24 +154,24 @@ const Register: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  placeholder="Create a password"
-                  className="input-field pl-10 w-full"
+                  placeholder="CREATE A PASSWORD"
+                  className="w-full pl-10 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700 transition-all"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <p className="text-xs text-text-muted">
-                Password must be at least 6 characters long
+              <p className="text-xs text-slate-600 font-mono">
+                PASSWORD MUST BE AT LEAST 6 CHARACTERS LONG
               </p>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-secondary">
+              <label htmlFor="confirmPassword" className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Confirm Password
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-text-muted" />
+                  <Lock className="h-5 w-5 text-slate-600 group-focus-within:text-cyan-500 transition-colors" />
                 </div>
                 <input
                   id="confirmPassword"
@@ -164,8 +179,8 @@ const Register: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  placeholder="Confirm your password"
-                  className="input-field pl-10 w-full"
+                  placeholder="CONFIRM YOUR PASSWORD"
+                  className="w-full pl-10 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700 transition-all"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
@@ -175,18 +190,18 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="button-primary w-full flex items-center justify-center"
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-sm flex items-center justify-center uppercase tracking-widest text-sm transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? <LoadingSpinner size="small" className="mr-2" /> : null}
-              {isLoading ? 'Registering...' : 'Register'}
+              {isLoading ? 'REGISTERING...' : 'REGISTER'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-text-secondary text-sm">
+            <p className="text-slate-500 text-xs uppercase tracking-wide">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary hover:underline font-medium">
-                Login here
+              <Link to="/login" className="text-cyan-400 hover:text-cyan-300 font-bold ml-1 hover:underline">
+                LOGIN HERE
               </Link>
             </p>
           </div>

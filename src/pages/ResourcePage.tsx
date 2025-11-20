@@ -285,7 +285,7 @@ const ResourcePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-950">
         <Navbar />
         <div className="flex-1 flex items-center justify-center h-screen">
           <LoadingSpinner size="large" />
@@ -295,157 +295,172 @@ const ResourcePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="max-w-4xl mx-auto"
-        >
-          {course && (
-            <motion.div variants={itemVariants} className="bg-card rounded-lg shadow-md p-6 mb-6">
-              <h1 className="text-2xl font-bold mb-2">{course.name}</h1>
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm">
-                  {course.code}
-                </span>
-                <span className="px-3 py-1 bg-card-hover rounded-full text-sm">
-                  Instructor: {course.instructor}
-                </span>
-              </div>
-              <p className="text-text-secondary">{course.description}</p>
-            </motion.div>
-          )}
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30">
+      {/* Cyber Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
+           style={{ 
+             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
+             backgroundSize: '40px 40px' 
+           }}>
+      </div>
+      
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
 
-          <div className="flex space-x-4 mb-6">
-            <button
-              onClick={() => setActiveTab('resources')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                activeTab === 'resources'
-                  ? 'bg-primary text-white'
-                  : 'bg-card-hover hover:bg-opacity-80'
-              }`}
-            >
-              Study Resources
-            </button>
-            <button
-              onClick={() => setActiveTab('papers')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                activeTab === 'papers'
-                  ? 'bg-primary text-white'
-                  : 'bg-card-hover hover:bg-opacity-80'
-              }`}
-            >
-              Question Papers
-            </button>
-          </div>
-
-          {activeTab === 'resources' && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center mb-4">
-                <motion.h2 variants={itemVariants} className="text-xl font-semibold flex items-center">
-                  <Book className="w-5 h-5 mr-2 text-primary" />
-                  Available Resources
-                </motion.h2>
-                <button
-                  onClick={() => setShowAddResource(true)}
-                  className="button-primary flex items-center"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Resource
-                </button>
-              </div>
-
-              {resources.map((resource) => (
-                <motion.div
-                  key={resource.id}
-                  variants={itemVariants}
-                  className="bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 flex items-center"
-                >
-                  <div className="p-3 bg-card-hover rounded-full mr-4">
-                    {getIconForResourceType(resource.file_type)}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h3 className="font-medium mb-1">{resource.title}</h3>
-                    <div className="flex flex-wrap text-sm text-text-muted gap-x-4">
-                      <span>Uploaded by: {resource.uploaded_by}</span>
-                      <span>Date: {formatDate(resource.uploaded_at)}</span>
-                      {resource.file_size && <span>Size: {resource.file_size}</span>}
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={() => handleDownload(resource)}
-                    className="button-outline flex items-center"
-                  >
-                    {resource.type === 'link' ? (
-                      <>
-                        <LinkIcon className="w-4 h-4 mr-1" />
-                        Visit
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-4 h-4 mr-1" />
-                        Download
-                      </>
-                    )}
-                  </button>
-                </motion.div>
-              ))}
-
-              {showAddResource && course && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                  <div className="bg-background rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                    <h3 className="text-xl font-semibold mb-4">Add New Resource</h3>
-                    <AddResourceForm
-                      courseId={course.id}
-                      onResourceAdded={handleResourceAdded}
-                      onClose={() => setShowAddResource(false)}
-                    />
-                  </div>
+      <div className="relative z-10">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 pt-48">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="max-w-4xl mx-auto"
+          >
+            {course && (
+              <motion.div variants={itemVariants} className="bg-slate-900/80 border border-slate-800 rounded-sm p-6 mb-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+                <h1 className="text-2xl font-bold mb-2 text-white uppercase tracking-widest">{course.name}</h1>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <span className="px-3 py-1 bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 rounded-sm text-xs font-bold uppercase tracking-wider">
+                    {course.code}
+                  </span>
+                  <span className="px-3 py-1 bg-slate-800 border border-slate-700 text-slate-300 rounded-sm text-xs font-bold uppercase tracking-wider">
+                    INSTRUCTOR: {course.instructor}
+                  </span>
                 </div>
-              )}
+                <p className="text-slate-400 text-sm leading-relaxed">{course.description}</p>
+              </motion.div>
+            )}
+
+            <div className="flex space-x-4 mb-6">
+              <button
+                onClick={() => setActiveTab('resources')}
+                className={`px-4 py-2 rounded-sm transition-all font-bold uppercase tracking-wider text-xs border ${
+                  activeTab === 'resources'
+                    ? 'bg-cyan-600 text-white border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                    : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400'
+                }`}
+              >
+                STUDY_RESOURCES
+              </button>
+              <button
+                onClick={() => setActiveTab('papers')}
+                className={`px-4 py-2 rounded-sm transition-all font-bold uppercase tracking-wider text-xs border ${
+                  activeTab === 'papers'
+                    ? 'bg-cyan-600 text-white border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                    : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400'
+                }`}
+              >
+                QUESTION_PAPERS
+              </button>
             </div>
-          )}
 
-          {activeTab === 'papers' && (
-            <div className="space-y-4">
-              <motion.h2 variants={itemVariants} className="text-xl font-semibold mb-4 flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-primary" />
-                Previous Year Question Papers
-              </motion.h2>
+            {activeTab === 'resources' && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-4">
+                  <motion.h2 variants={itemVariants} className="text-xl font-bold flex items-center text-white uppercase tracking-wide">
+                    <Book className="w-5 h-5 mr-2 text-cyan-500" />
+                    AVAILABLE_DATA
+                  </motion.h2>
+                  <button
+                    onClick={() => setShowAddResource(true)}
+                    className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-sm flex items-center uppercase tracking-wider text-xs transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    UPLOAD_DATA
+                  </button>
+                </div>
 
-              {questionPapers.map((paper) => (
-                <motion.div
-                  key={paper.id}
-                  variants={itemVariants}
-                  className="bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 flex items-center"
-                >
-                  <div className="p-3 bg-card-hover rounded-full mr-4">
-                    <Calendar className="w-5 h-5 text-primary" />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h3 className="font-medium mb-1">{paper.title}</h3>
-                    <div className="flex flex-wrap text-sm text-text-muted gap-x-4">
-                      <span>Year: {paper.year}</span>
-                      <span>Added: {formatDate(paper.created_at)}</span>
+                {resources.map((resource) => (
+                  <motion.div
+                    key={resource.id}
+                    variants={itemVariants}
+                    className="bg-slate-900/50 border border-slate-800 rounded-sm p-4 flex items-center hover:border-cyan-500/30 transition-all group"
+                  >
+                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-sm mr-4 group-hover:border-cyan-500/50 transition-colors">
+                      {getIconForResourceType(resource.file_type)}
+                    </div>
+                    
+                    <div className="flex-1">
+                      <h3 className="font-bold text-slate-200 mb-1 group-hover:text-cyan-400 transition-colors">{resource.title}</h3>
+                      <div className="flex flex-wrap text-xs text-slate-500 gap-x-4 font-mono uppercase">
+                        <span>BY: {resource.uploaded_by}</span>
+                        <span>DATE: {formatDate(resource.uploaded_at)}</span>
+                        {resource.file_size && <span>SIZE: {resource.file_size}</span>}
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => handleDownload(resource)}
+                      className="bg-transparent border border-slate-700 hover:border-cyan-500 text-slate-400 hover:text-cyan-400 px-4 py-2 rounded-sm flex items-center transition-all uppercase tracking-wider text-xs font-bold"
+                    >
+                      {resource.type === 'link' ? (
+                        <>
+                          <LinkIcon className="w-4 h-4 mr-2" />
+                          ACCESS
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4 mr-2" />
+                          DOWNLOAD
+                        </>
+                      )}
+                    </button>
+                  </motion.div>
+                ))}
+
+                {showAddResource && course && (
+                  <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-slate-900 border border-cyan-500/30 rounded-sm p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_30px_rgba(6,182,212,0.2)] relative">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
+                      <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-widest">Initialize Upload Protocol</h3>
+                      <AddResourceForm
+                        courseId={course.id}
+                        onResourceAdded={handleResourceAdded}
+                        onClose={() => setShowAddResource(false)}
+                      />
                     </div>
                   </div>
-                  
-                  <button className="button-outline flex items-center">
-                    <Download className="w-4 h-4 mr-1" />
-                    Download
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </motion.div>
-      </main>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'papers' && (
+              <div className="space-y-4">
+                <motion.h2 variants={itemVariants} className="text-xl font-bold mb-4 flex items-center text-white uppercase tracking-wide">
+                  <FileText className="w-5 h-5 mr-2 text-cyan-500" />
+                  ARCHIVED_PAPERS
+                </motion.h2>
+
+                {questionPapers.map((paper) => (
+                  <motion.div
+                    key={paper.id}
+                    variants={itemVariants}
+                    className="bg-slate-900/50 border border-slate-800 rounded-sm p-4 flex items-center hover:border-cyan-500/30 transition-all group"
+                  >
+                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-sm mr-4 group-hover:border-cyan-500/50 transition-colors">
+                      <Calendar className="w-5 h-5 text-cyan-500" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <h3 className="font-bold text-slate-200 mb-1 group-hover:text-cyan-400 transition-colors">{paper.title}</h3>
+                      <div className="flex flex-wrap text-xs text-slate-500 gap-x-4 font-mono uppercase">
+                        <span>YEAR: {paper.year}</span>
+                        <span>ADDED: {formatDate(paper.created_at)}</span>
+                      </div>
+                    </div>
+                    
+                    <button className="bg-transparent border border-slate-700 hover:border-cyan-500 text-slate-400 hover:text-cyan-400 px-4 py-2 rounded-sm flex items-center transition-all uppercase tracking-wider text-xs font-bold">
+                      <Download className="w-4 h-4 mr-2" />
+                      DOWNLOAD
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </main>
+      </div>
     </div>
   );
 };

@@ -138,9 +138,16 @@ const DiscussionPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+        {/* Cyber Grid Background */}
+        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
+             style={{ 
+               backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
+               backgroundSize: '40px 40px' 
+             }}>
+        </div>
         <Navbar />
-        <div className="flex-1 flex items-center justify-center h-screen">
+        <div className="flex-1 flex items-center justify-center h-screen relative z-10">
           <LoadingSpinner size="large" />
         </div>
       </div>
@@ -148,134 +155,152 @@ const DiscussionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="flex h-[calc(100vh-64px)]">
-        <div className="hidden md:block">
-          <Sidebar />
-        </div>
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="max-w-4xl mx-auto"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold flex items-center">
-                <MessageSquare className="w-6 h-6 mr-2 text-primary" />
-                Discussion Forum
-              </h1>
-              
-              <button
-                onClick={() => setIsCreatingPost(!isCreatingPost)}
-                className="button-primary flex items-center"
-              >
-                {isCreatingPost ? (
-                  <>
-                    <ArrowUp className="w-4 h-4 mr-1" />
-                    Cancel
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-1" />
-                    New Post
-                  </>
-                )}
-              </button>
-            </div>
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30">
+      {/* Cyber Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
+           style={{ 
+             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
+             backgroundSize: '40px 40px' 
+           }}>
+      </div>
+      
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
 
-            {isCreatingPost && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mb-6 bg-card rounded-lg shadow-md p-5"
-              >
-                <h2 className="text-lg font-medium mb-4">Create a New Post</h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="post-title" className="block text-sm font-medium text-text-secondary mb-1">
-                      Title
-                    </label>
-                    <input
-                      id="post-title"
-                      type="text"
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      placeholder="Enter a descriptive title"
-                      className="input-field w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="post-content" className="block text-sm font-medium text-text-secondary mb-1">
-                      Content
-                    </label>
-                    <textarea
-                      id="post-content"
-                      value={newPost}
-                      onChange={(e) => setNewPost(e.target.value)}
-                      placeholder="What would you like to discuss?"
-                      rows={4}
-                      className="input-field w-full resize-none"
-                    />
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleCreatePost}
-                      disabled={!newTitle.trim() || !newPost.trim()}
-                      className="button-primary flex items-center"
-                    >
-                      <Send className="w-4 h-4 mr-1" />
-                      Post
-                    </button>
-                  </div>
+      <div className="relative z-10">
+        <Navbar />
+        <div className="flex h-screen">
+          <div className="hidden md:block h-full">
+            <Sidebar />
+          </div>
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 pt-56">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="max-w-4xl mx-auto mt-24"
+            >
+              <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+                <div>
+                  <h1 className="text-2xl font-bold flex items-center text-white uppercase tracking-widest">
+                    <MessageSquare className="w-6 h-6 mr-2 text-cyan-500" />
+                    DISCUSSION_FORUM
+                  </h1>
                 </div>
-              </motion.div>
-            )}
-
-            <div className="space-y-4">
-              {discussions.map((discussion) => (
-                <motion.div
-                  key={discussion.id}
-                  variants={itemVariants}
-                  className="bg-card rounded-lg shadow-md p-5 hover:shadow-lg transition-shadow"
+                
+                <button
+                  onClick={() => setIsCreatingPost(!isCreatingPost)}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold py-2 px-4 rounded-sm flex items-center uppercase tracking-wider transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)]"
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <h2 className="text-lg font-medium">{discussion.title}</h2>
-                    <div className="flex items-center text-text-muted text-sm">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {formatDate(discussion.created_at)}
-                    </div>
-                  </div>
+                  {isCreatingPost ? (
+                    <>
+                      <ArrowUp className="w-4 h-4 mr-1" />
+                      ABORT
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-1" />
+                      INITIATE THREAD
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {isCreatingPost && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 bg-slate-900/80 border border-cyan-500/30 rounded-sm shadow-lg p-5 relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+                  <h2 className="text-sm font-bold mb-4 text-cyan-400 uppercase tracking-widest">New Transmission Protocol</h2>
                   
-                  <p className="text-text-secondary mb-4">{discussion.content}</p>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="text-text-muted text-sm">
-                      Posted by <span className="text-text-primary">{discussion.author}</span>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="post-title" className="block text-xs font-bold text-slate-500 mb-1 uppercase">
+                        Subject Line
+                      </label>
+                      <input
+                        id="post-title"
+                        type="text"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        placeholder="ENTER SUBJECT"
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700"
+                      />
                     </div>
                     
-                    <div className="flex items-center space-x-4">
-                      <button className="flex items-center text-text-secondary hover:text-primary transition-colors">
-                        <MessageSquare className="w-4 h-4 mr-1" />
-                        <span>{discussion.replies}</span>
-                      </button>
-                      
-                      <button className="flex items-center text-text-secondary hover:text-primary transition-colors">
-                        <ThumbsUp className="w-4 h-4 mr-1" />
-                        <span>{discussion.likes}</span>
+                    <div>
+                      <label htmlFor="post-content" className="block text-xs font-bold text-slate-500 mb-1 uppercase">
+                        Message Body
+                      </label>
+                      <textarea
+                        id="post-content"
+                        value={newPost}
+                        onChange={(e) => setNewPost(e.target.value)}
+                        placeholder="ENTER MESSAGE CONTENT..."
+                        rows={4}
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono resize-none placeholder-slate-700"
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <button
+                        onClick={handleCreatePost}
+                        disabled={!newTitle.trim() || !newPost.trim()}
+                        className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-6 rounded-sm flex items-center uppercase tracking-widest text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                      >
+                        <Send className="w-3 h-3 mr-2" />
+                        TRANSMIT
                       </button>
                     </div>
                   </div>
                 </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </main>
+              )}
+
+              <div className="space-y-4">
+                {discussions.map((discussion) => (
+                  <motion.div
+                    key={discussion.id}
+                    variants={itemVariants}
+                    className="bg-slate-900/50 border border-slate-800 rounded-sm p-5 hover:border-cyan-500/30 transition-all group relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 w-0.5 h-full bg-slate-800 group-hover:bg-cyan-500 transition-colors"></div>
+                    
+                    <div className="flex justify-between items-start mb-2 pl-2">
+                      <h2 className="text-lg font-bold text-slate-200 group-hover:text-cyan-400 transition-colors">{discussion.title}</h2>
+                      <div className="flex items-center text-slate-500 text-xs font-mono">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {formatDate(discussion.created_at).toUpperCase()}
+                      </div>
+                    </div>
+                    
+                    <p className="text-slate-400 mb-4 pl-2 text-sm leading-relaxed">{discussion.content}</p>
+                    
+                    <div className="flex justify-between items-center pl-2 border-t border-slate-800/50 pt-3 mt-2">
+                      <div className="text-slate-600 text-xs font-mono uppercase">
+                        ORIGIN: <span className="text-cyan-600">{discussion.author}</span>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        <button className="flex items-center text-slate-500 hover:text-cyan-400 transition-colors text-xs font-bold uppercase">
+                          <MessageSquare className="w-3 h-3 mr-1" />
+                          <span>{discussion.replies} REPLIES</span>
+                        </button>
+                        
+                        <button className="flex items-center text-slate-500 hover:text-green-400 transition-colors text-xs font-bold uppercase">
+                          <ThumbsUp className="w-3 h-3 mr-1" />
+                          <span>{discussion.likes} ACKS</span>
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -91,9 +91,9 @@ const DepartmentPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center h-screen">
+        <div className="flex-1 flex items-center justify-center h-screen relative z-10">
           <LoadingSpinner size="large" />
         </div>
       </div>
@@ -101,65 +101,110 @@ const DepartmentPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="max-w-4xl mx-auto"
-        >
-          {department && (
-            <motion.div variants={itemVariants} className="bg-card rounded-lg shadow-md p-6 mb-6">
-              <h1 className="text-2xl font-bold mb-2">{department.name}</h1>
-              <p className="text-text-secondary">{department.description}</p>
-            </motion.div>
-          )}
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30">
+      {/* Cyber Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
+           style={{ 
+             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
+             backgroundSize: '40px 40px' 
+           }}>
+      </div>
+      
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
 
-          <motion.div variants={itemVariants} className="mb-6">
-            <div className="flex flex-wrap gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((semester) => (
-                <button
-                  key={semester}
-                  onClick={() => setCurrentSemester(semester)}
-                  className={`px-4 py-2 rounded-md transition-colors ${
-                    currentSemester === semester
-                      ? 'bg-primary text-white'
-                      : 'bg-card-hover hover:bg-opacity-80'
-                  }`}
+      <div className="relative z-10">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 pt-36">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="max-w-6xl mx-auto"
+          >
+            {department && (
+              <motion.div variants={itemVariants} className="bg-slate-900/80 border border-slate-800 rounded-sm p-6 mb-8 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+                <h1 className="text-3xl font-bold mb-2 text-white uppercase tracking-widest glitch-text" data-text={department.name}>{department.name}</h1>
+                <p className="text-slate-400 max-w-3xl leading-relaxed">{department.description}</p>
+              </motion.div>
+            )}
+
+            <motion.div variants={itemVariants} className="mb-8">
+              <div className="flex items-center mb-4">
+                <div className="h-px flex-1 bg-slate-800"></div>
+                <span className="px-4 text-xs font-bold text-cyan-500 uppercase tracking-widest">SELECT SEMESTER MODULE</span>
+                <div className="h-px flex-1 bg-slate-800"></div>
+              </div>
+              
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((semester) => (
+                  <button
+                    key={semester}
+                    onClick={() => setCurrentSemester(semester)}
+                    className={`px-6 py-3 rounded-sm transition-all font-bold uppercase tracking-wider text-sm border ${
+                      currentSemester === semester
+                        ? 'bg-cyan-600 text-white border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                        : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400'
+                    }`}
+                  >
+                    SEM {semester}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCourses.map((course) => (
+                <motion.div
+                  key={course.id}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-slate-900/50 border border-slate-800 rounded-sm overflow-hidden hover:border-cyan-500/50 transition-all group relative"
                 >
-                  Semester {semester}
-                </button>
+                  {/* Corner accents */}
+                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[20px] border-r-[20px] border-t-transparent border-r-slate-800 group-hover:border-r-cyan-500/30 transition-colors"></div>
+                  
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-lg text-slate-200 group-hover:text-cyan-400 transition-colors uppercase tracking-wide">{course.name}</h3>
+                      <span className="text-xs font-mono text-slate-500 border border-slate-700 px-2 py-1 rounded-sm">{course.code}</span>
+                    </div>
+                    
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center text-xs text-slate-400">
+                        <span className="w-24 text-slate-600 uppercase">INSTRUCTOR:</span>
+                        <span className="font-mono text-cyan-500/80">{course.instructor}</span>
+                      </div>
+                      <div className="flex items-center text-xs text-slate-400">
+                        <span className="w-24 text-slate-600 uppercase">STATUS:</span>
+                        <span className="text-green-500">ACTIVE</span>
+                      </div>
+                    </div>
+                    
+                    <Link
+                      to={`/resource/${course.id}`}
+                      className="w-full bg-slate-950 border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 font-bold py-3 px-4 rounded-sm flex items-center justify-center uppercase tracking-widest text-xs transition-all group-hover:shadow-[0_0_10px_rgba(0,0,0,0.3)]"
+                    >
+                      <Book className="w-3 h-3 mr-2" />
+                      ACCESS RESOURCES
+                    </Link>
+                  </div>
+                </motion.div>
               ))}
             </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCourses.map((course) => (
-              <motion.div
-                key={course.id}
-                variants={itemVariants}
-                whileHover={{ scale: 1.02 }}
-                className="bg-card rounded-lg overflow-hidden shadow-sm"
-              >
-                <div className="p-5">
-                  <h3 className="font-medium text-lg mb-2">{course.name}</h3>
-                  <p className="text-text-secondary text-sm mb-2">Code: {course.code}</p>
-                  <p className="text-text-secondary text-sm mb-4">Instructor: {course.instructor}</p>
-                  <Link
-                    to={`/resource/${course.id}`}
-                    className="button-primary flex items-center justify-center"
-                  >
-                    <Book className="w-4 h-4 mr-2" />
-                    View Resources
-                  </Link>
+            
+            {filteredCourses.length === 0 && (
+              <div className="text-center py-16 border border-dashed border-slate-800 rounded-sm bg-slate-900/20">
+                <div className="inline-block p-4 rounded-full bg-slate-900 mb-4 border border-slate-800">
+                  <Book className="w-8 h-8 text-slate-600" />
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </main>
+                <p className="text-slate-500 text-lg uppercase tracking-widest">NO COURSE DATA FOUND FOR SEMESTER {currentSemester}</p>
+              </div>
+            )}
+          </motion.div>
+        </main>
+      </div>
     </div>
   );
 };
