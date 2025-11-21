@@ -57,7 +57,7 @@ function App() {
               }
             />
             <Route
-              path="/department/:departmentId"
+              path="/department/:departmentName"
               element={
                 <ProtectedRoute>
                   <DepartmentPage />

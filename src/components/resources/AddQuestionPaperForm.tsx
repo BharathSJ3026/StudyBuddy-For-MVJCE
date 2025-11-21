@@ -3,104 +3,79 @@ import { useSupabase } from '../../contexts/SupabaseContext';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
-interface AddResourceFormProps {
+interface AddQuestionPaperFormProps {
   courseId: string;
-  onResourceAdded: () => void;
+  onPaperAdded: () => void;
   onClose: () => void;
 }
 
-const AddResourceForm: React.FC<AddResourceFormProps> = ({
+const AddQuestionPaperForm: React.FC<AddQuestionPaperFormProps> = ({
   courseId,
-  onResourceAdded,
+  onPaperAdded,
   onClose,
 }) => {
   const [title, setTitle] = useState('');
+  const [year, setYear] = useState(new Date().getFullYear().toString());
   const [link, setLink] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { supabase } = useSupabase();
   const { user } = useAuth();
 
-  // Check if form is valid
   const isFormValid = () => {
     if (!title.trim()) return false;
+    if (!year.trim() || isNaN(Number(year))) return false;
     return link.trim() !== '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error('You must be logged in to add resources');
+      toast.error('You must be logged in to add question papers');
       return;
     }
 
-    if (!title.trim()) {
-      toast.error('Please enter a title');
-      return;
-    }
-
-    if (!link.trim()) {
-      toast.error('Please enter a link URL');
+    if (!isFormValid()) {
+      toast.error('Please fill in all fields correctly');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const resourceData = {
+      const paperData = {
         title: title.trim(),
-        type: 'link',
+        year: parseInt(year),
         course_id: courseId,
-        uploaded_by: user.email,
         file_url: link,
-        file_type: 'link',
-        file_size: null,
       };
 
-      console.log('Attempting to add resource with data:', resourceData);
+      console.log('Attempting to add question paper:', paperData);
 
-      // First, verify the course exists
-      const { data: courseData, error: courseError } = await supabase
-        .from('courses')
-        .select('id')
-        .eq('id', courseId)
-        .single();
-
-      if (courseError) {
-        console.error('Error verifying course:', courseError);
-        throw new Error('Invalid course ID');
-      }
-
-      console.log('Course verification successful:', courseData);
-
-      // Insert the resource
       const { data, error } = await supabase
-        .from('resources')
-        .insert(resourceData)
+        .from('question_papers')
+        .insert(paperData)
         .select();
 
       if (error) {
-        console.error('Error adding resource:', error);
+        console.error('Error adding question paper:', error);
         throw error;
       }
 
-      console.log('Resource added successfully:', data);
-
-      toast.success('Resource added successfully!');
-      onResourceAdded();
+      toast.success('Question paper added successfully!');
+      onPaperAdded();
       onClose();
     } catch (error) {
-      console.error('Error adding resource:', error);
-      toast.error(`Failed to add resource: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error adding question paper:', error);
+      toast.error(`Failed to add question paper: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Determine button text and disabled state
   const getButtonText = () => {
-    if (isSubmitting) return 'Adding...';
-    return 'Add Resource';
+    if (isSubmitting) return 'ADDING...';
+    return 'ADD PAPER';
   };
 
   const isButtonDisabled = isSubmitting || !isFormValid();
@@ -109,7 +84,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="title" className="block text-xs font-bold text-slate-500 mb-1 uppercase">
-          Title
+          Paper Title / Exam Name
         </label>
         <input
           type="text"
@@ -117,7 +92,22 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700"
-          placeholder="ENTER RESOURCE TITLE"
+          placeholder="E.G. MID-TERM EXAM 2024"
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="year" className="block text-xs font-bold text-slate-500 mb-1 uppercase">
+          Year
+        </label>
+        <input
+          type="number"
+          id="year"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+          className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono placeholder-slate-700"
+          placeholder="2024"
           required
         />
       </div>
@@ -143,7 +133,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({
           onClick={onClose}
           className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white border border-slate-700 hover:border-slate-500 rounded-sm uppercase tracking-wider transition-all"
         >
-          Cancel
+          CANCEL
         </button>
         <button
           type="submit"
@@ -161,4 +151,4 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({
   );
 };
 
-export default AddResourceForm; 
+export default AddQuestionPaperForm;

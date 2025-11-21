@@ -5,6 +5,8 @@ import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 interface ScheduleEvent {
   id: string;
@@ -13,6 +15,7 @@ interface ScheduleEvent {
   date: string;
   time: string;
   type: 'class' | 'exam' | 'assignment' | 'study';
+  user_id: string;
 }
 
 const CalendarView: React.FC<{ events: ScheduleEvent[], onSelectDate: (date: string | null) => void, selectedDate: string | null }> = ({ events, onSelectDate, selectedDate }) => {
@@ -119,7 +122,7 @@ const SchedulePage: React.FC = () => {
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [showDayDetailsModal, setShowDayDetailsModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [newEvent, setNewEvent] = useState<Omit<ScheduleEvent, 'id'>>({
+  const [newEvent, setNewEvent] = useState<Omit<ScheduleEvent, 'id' | 'user_id'>>({
     title: '',
     description: '',
     date: '',
@@ -128,81 +131,111 @@ const SchedulePage: React.FC = () => {
   });
   
   const { supabase } = useSupabase();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchSchedule = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        // Simulate data loading since Supabase isn't connected yet
-        setTimeout(() => {
-          // Mock schedule data
-          setEvents([
-            {
-              id: '1',
-              title: 'Database Systems Lecture',
-              description: 'Indexing and query optimization topics',
-              date: '2025-08-10',
-              time: '10:00',
-              type: 'class'
-            },
-            {
-              id: '2',
-              title: 'Data Structures Assignment Due',
-              description: 'Implementation of AVL trees',
-              date: '2025-08-12',
-              time: '23:59',
-              type: 'assignment'
-            },
-            {
-              id: '3',
-              title: 'Machine Learning Mid-term Exam',
-              description: 'Covers classification, regression, and neural networks',
-              date: '2025-08-15',
-              time: '14:00',
-              type: 'exam'
-            },
-            {
-              id: '4',
-              title: 'Study Group Meeting',
-              description: 'Prepare for the networking exam',
-              date: '2025-08-11',
-              time: '16:00',
-              type: 'study'
-            },
-          ]);
-          
-          setIsLoading(false);
-        }, 1000);
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('schedules')
+          .select('*')
+          .order('event_date', { ascending: true });
+
+        if (error) throw error;
+
+        if (data) {
+          const formattedEvents: ScheduleEvent[] = data.map(event => ({
+            id: event.id,
+            title: event.title,
+            description: event.description || '',
+            date: event.event_date,
+            time: event.event_time ? event.event_time.substring(0, 5) : '',
+            type: (event.event_type as any) || 'class',
+            user_id: event.user_id
+          }));
+          setEvents(formattedEvents);
+        }
       } catch (error) {
         console.error('Error fetching schedule:', error);
+        toast.error('Failed to load schedule');
+      } finally {
         setIsLoading(false);
       }
     };
 
     fetchSchedule();
-  }, [supabase]);
+  }, [supabase, user]);
 
-  const handleAddEvent = () => {
+  const handleAddEvent = async () => {
     if (!newEvent.title || !newEvent.date || !newEvent.time) return;
+    if (!user) {
+      toast.error('You must be logged in to add events');
+      return;
+    }
     
-    // In a real implementation, this would be a Supabase call
-    const event: ScheduleEvent = {
-      id: Date.now().toString(),
-      ...newEvent
-    };
-    
-    setEvents([...events, event]);
-    setShowAddEventModal(false);
-    setNewEvent({
-      title: '',
-      description: '',
-      date: '',
-      time: '',
-      type: 'class'
-    });
+    try {
+      const { data, error } = await supabase
+        .from('schedules')
+        .insert({
+          user_id: user.id,
+          title: newEvent.title,
+          description: newEvent.description,
+          event_date: newEvent.date,
+          event_time: newEvent.time,
+          event_type: newEvent.type
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const event: ScheduleEvent = {
+        id: data.id,
+        title: data.title,
+        description: data.description || '',
+        date: data.event_date,
+        time: data.event_time ? data.event_time.substring(0, 5) : '',
+        type: (data.event_type as any) || 'class',
+        user_id: data.user_id
+      };
+      
+      setEvents([...events, event]);
+      setShowAddEventModal(false);
+      setNewEvent({
+        title: '',
+        description: '',
+        date: '',
+        time: '',
+        type: 'class'
+      });
+      toast.success('Event added successfully');
+    } catch (error) {
+      console.error('Error adding event:', error);
+      toast.error('Failed to add event');
+    }
   };
 
-  const handleDeleteEvent = (id: string) => {
-    setEvents(events.filter(event => event.id !== id));
+  const handleDeleteEvent = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('schedules')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setEvents(events.filter(event => event.id !== id));
+      toast.success('Event deleted');
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
+    }
   };
 
   const getEventColor = (type: string) => {
@@ -304,15 +337,19 @@ const SchedulePage: React.FC = () => {
               </div>
               
               <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="p-1.5 rounded-sm hover:bg-slate-800 text-slate-400 hover:text-cyan-400 transition-colors">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={() => handleDeleteEvent(event.id)}
-                  className="p-1.5 rounded-sm hover:bg-slate-800 text-slate-400 hover:text-red-400 transition-colors"
-                >
-                  <Trash className="w-4 h-4" />
-                </button>
+                {user && user.id === event.user_id && (
+                  <>
+                    <button className="p-1.5 rounded-sm hover:bg-slate-800 text-slate-400 hover:text-cyan-400 transition-colors">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="p-1.5 rounded-sm hover:bg-slate-800 text-slate-400 hover:text-red-400 transition-colors"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             

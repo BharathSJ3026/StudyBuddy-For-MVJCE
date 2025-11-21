@@ -1,10 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, Brain, Calendar, Shield, Activity, Terminal, Lock, Cpu, Wifi, Clock, ArrowRight, ChevronRight } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
+import { useSupabase } from '../contexts/SupabaseContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard: React.FC = () => {
+  const { supabase } = useSupabase();
+  const { user } = useAuth();
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!user) {
+        setLoadingEvents(false);
+        return;
+      }
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabase
+          .from('schedules')
+          .select('*')
+          .gte('event_date', today)
+          .order('event_date', { ascending: true })
+          .limit(3);
+
+        if (data) {
+          setUpcomingEvents(data);
+        }
+      } catch (error) {
+        console.error('Error fetching events', error);
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+
+    fetchEvents();
+  }, [user, supabase]);
+
+  const getEventColor = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'exam': return 'red';
+      case 'assignment': return 'yellow';
+      case 'class': return 'blue';
+      default: return 'green';
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -208,73 +252,48 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { title: "Database Systems Lecture", date: "AUG 10", time: "10:00 HRS", type: "CLASS", color: "blue" },
-                  { title: "Data Structures Assignment", date: "AUG 12", time: "23:59 HRS", type: "DEADLINE", color: "yellow" },
-                  { title: "Machine Learning Exam", date: "AUG 15", time: "14:00 HRS", type: "EXAM", color: "red" }
-                ].map((event, i) => (
-                  <Link to="/schedule" key={i} className="group block">
-                    <div className="bg-slate-900/50 border border-slate-800 hover:border-cyan-500/50 p-5 rounded-sm transition-all duration-300 hover:bg-slate-900 hover:translate-y-[-2px] relative overflow-hidden">
-                      <div className={`absolute top-0 left-0 w-1 h-full bg-${event.color}-500`}></div>
-                      <div className="flex justify-between items-start mb-3">
-                        <span className={`text-[10px] font-bold px-2 py-1 bg-${event.color}-500/10 text-${event.color}-400 rounded-sm uppercase`}>
-                          {event.type}
-                        </span>
-                        <span className="text-slate-500 text-xs font-mono">{event.date}</span>
-                      </div>
-                      <h4 className="text-white font-bold mb-2 group-hover:text-cyan-400 transition-colors truncate">{event.title}</h4>
-                      <div className="flex items-center text-slate-500 text-xs font-mono">
-                        <Clock className="w-3 h-3 mr-2" />
-                        {event.time}
-                      </div>
-                      <div className="absolute bottom-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <ArrowRight className="w-4 h-4 text-cyan-500 -rotate-45" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                {loadingEvents ? (
+                  <div className="col-span-3 text-center py-8 text-slate-500 font-mono text-xs uppercase tracking-widest animate-pulse">LOADING SCHEDULE DATA...</div>
+                ) : upcomingEvents.length === 0 ? (
+                  <div className="col-span-3 text-center py-8 border border-slate-800 border-dashed rounded-sm">
+                    <p className="text-slate-500 uppercase tracking-widest text-xs">No upcoming events found</p>
+                    <Link to="/schedule" className="text-cyan-500 text-xs mt-2 inline-block hover:underline uppercase tracking-wider">ADD EVENT</Link>
+                  </div>
+                ) : (
+                  upcomingEvents.map((event, i) => {
+                    const color = getEventColor(event.event_type);
+                    const dateStr = new Date(event.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+                    const timeStr = event.event_time ? event.event_time.substring(0, 5) + ' HRS' : 'ALL DAY';
+                    
+                    return (
+                      <Link to="/schedule" key={i} className="group block">
+                        <div className={`bg-slate-900/50 border border-slate-800 hover:border-${color}-500/50 p-5 rounded-sm transition-all duration-300 hover:bg-slate-900 hover:translate-y-[-2px] relative overflow-hidden`}>
+                          <div className={`absolute top-0 left-0 w-1 h-full bg-${color}-500`}></div>
+                          <div className="flex justify-between items-start mb-3">
+                            <span className={`text-[10px] font-bold px-2 py-1 bg-${color}-500/10 text-${color}-400 rounded-sm uppercase`}>
+                              {event.event_type || 'EVENT'}
+                            </span>
+                            <span className="text-slate-500 text-xs font-mono">{dateStr}</span>
+                          </div>
+                          <h4 className="text-white font-bold mb-2 group-hover:text-cyan-400 transition-colors truncate">{event.title}</h4>
+                          <div className="flex items-center text-slate-500 text-xs font-mono">
+                            <Clock className="w-3 h-3 mr-2" />
+                            {timeStr}
+                          </div>
+                          <div className="absolute bottom-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ArrowRight className="w-4 h-4 text-cyan-500 -rotate-45" />
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
+                )}
               </div>
             </motion.div>
           </div>
         </motion.section>
 
-        {/* System Log Section */}
-        <section className="pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              className="bg-black/40 border border-slate-800 p-6 font-mono text-xs md:text-sm text-slate-500"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-2">
-                <Terminal className="w-4 h-4" />
-                <span className="text-cyan-500">SYSTEM_LOG</span>
-              </div>
-              <div className="space-y-2">
-                <div className="flex gap-4">
-                  <span className="text-slate-600">[10:42:05]</span>
-                  <span>Initializing user interface protocols...</span>
-                  <span className="text-green-500">DONE</span>
-                </div>
-                <div className="flex gap-4">
-                  <span className="text-slate-600">[10:42:06]</span>
-                  <span>Loading resource database...</span>
-                  <span className="text-green-500">DONE</span>
-                </div>
-                <div className="flex gap-4">
-                  <span className="text-slate-600">[10:42:08]</span>
-                  <span>Checking security parameters...</span>
-                  <span className="text-green-500">SECURE</span>
-                </div>
-                <div className="flex gap-4">
-                  <span className="text-slate-600">[10:42:09]</span>
-                  <span className="animate-pulse text-cyan-400">Waiting for user input_</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+
       </div>
     </div>
   );

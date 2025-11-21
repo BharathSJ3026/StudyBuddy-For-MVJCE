@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FileText, Download, Book, Video, Link as LinkIcon, Calendar, Plus } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FileText, Download, Book, Video, Link as LinkIcon, Calendar, Plus, X, ExternalLink, ArrowLeft } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import AddResourceForm from '../components/resources/AddResourceForm';
+import AddQuestionPaperForm from '../components/resources/AddQuestionPaperForm';
 import { useSupabase } from '../contexts/SupabaseContext';
 import toast from 'react-hot-toast';
 
@@ -37,12 +38,15 @@ interface QuestionPaper {
 
 const ResourcePage: React.FC = () => {
   const { resourceId } = useParams<{ resourceId: string }>();
+  const navigate = useNavigate();
   const [course, setCourse] = useState<Course | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
   const [questionPapers, setQuestionPapers] = useState<QuestionPaper[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'resources' | 'papers'>('resources');
   const [showAddResource, setShowAddResource] = useState(false);
+  const [showAddPaper, setShowAddPaper] = useState(false);
+  const [viewingResource, setViewingResource] = useState<{ title: string; file_url: string } | null>(null);
   
   const { supabase } = useSupabase();
 
@@ -165,10 +169,36 @@ const ResourcePage: React.FC = () => {
     fetchResourceData();
   };
 
+  const handlePaperAdded = () => {
+    fetchResourceData();
+  };
+
+  const getGoogleDriveEmbedUrl = (url: string) => {
+    // Extract ID from common Google Drive URL patterns
+    const patterns = [
+      /\/file\/d\/([^/]+)/,
+      /\/d\/([^/]+)/,
+      /id=([^&]+)/
+    ];
+  
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return `https://drive.google.com/file/d/${match[1]}/preview`;
+      }
+    }
+    return url; // Return original if no ID found (fallback)
+  };
+
   const handleDownload = async (resource: Resource) => {
     try {
       if (resource.type === 'link') {
-        window.open(resource.file_url, '_blank');
+        // Check if it's a Google Drive link
+        if (resource.file_url.includes('drive.google.com')) {
+          setViewingResource({ title: resource.title, file_url: resource.file_url });
+        } else {
+          window.open(resource.file_url, '_blank');
+        }
         return;
       }
 
@@ -316,6 +346,14 @@ const ResourcePage: React.FC = () => {
             animate="visible"
             className="max-w-4xl mx-auto"
           >
+            <button 
+              onClick={() => navigate(-1)} 
+              className="flex items-center text-cyan-500 hover:text-cyan-400 mb-6 transition-colors uppercase tracking-widest text-xs font-bold"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              BACK TO COURSES
+            </button>
+
             {course && (
               <motion.div variants={itemVariants} className="bg-slate-900/80 border border-slate-800 rounded-sm p-6 mb-6 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
@@ -397,7 +435,7 @@ const ResourcePage: React.FC = () => {
                       {resource.type === 'link' ? (
                         <>
                           <LinkIcon className="w-4 h-4 mr-2" />
-                          ACCESS
+                          ACCESS RESOURCE
                         </>
                       ) : (
                         <>
@@ -427,10 +465,19 @@ const ResourcePage: React.FC = () => {
 
             {activeTab === 'papers' && (
               <div className="space-y-4">
-                <motion.h2 variants={itemVariants} className="text-xl font-bold mb-4 flex items-center text-white uppercase tracking-wide">
-                  <FileText className="w-5 h-5 mr-2 text-cyan-500" />
-                  ARCHIVED_PAPERS
-                </motion.h2>
+                <div className="flex justify-between items-center mb-4">
+                  <motion.h2 variants={itemVariants} className="text-xl font-bold flex items-center text-white uppercase tracking-wide">
+                    <FileText className="w-5 h-5 mr-2 text-cyan-500" />
+                    ARCHIVED_PAPERS
+                  </motion.h2>
+                  <button
+                    onClick={() => setShowAddPaper(true)}
+                    className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-sm flex items-center uppercase tracking-wider text-xs transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    UPLOAD_PAPER
+                  </button>
+                </div>
 
                 {questionPapers.map((paper) => (
                   <motion.div
@@ -450,15 +497,83 @@ const ResourcePage: React.FC = () => {
                       </div>
                     </div>
                     
-                    <button className="bg-transparent border border-slate-700 hover:border-cyan-500 text-slate-400 hover:text-cyan-400 px-4 py-2 rounded-sm flex items-center transition-all uppercase tracking-wider text-xs font-bold">
-                      <Download className="w-4 h-4 mr-2" />
-                      DOWNLOAD
+                    <button 
+                      onClick={() => {
+                        if (paper.file_url.includes('drive.google.com')) {
+                          setViewingResource({ title: paper.title, file_url: paper.file_url });
+                        } else {
+                          window.open(paper.file_url, '_blank');
+                        }
+                      }}
+                      className="bg-transparent border border-slate-700 hover:border-cyan-500 text-slate-400 hover:text-cyan-400 px-4 py-2 rounded-sm flex items-center transition-all uppercase tracking-wider text-xs font-bold"
+                    >
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      ACCESS RESOURCE
                     </button>
                   </motion.div>
                 ))}
+
+                {showAddPaper && course && (
+                  <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-slate-900 border border-cyan-500/30 rounded-sm p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_30px_rgba(6,182,212,0.2)] relative">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
+                      <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-widest">Upload Question Paper</h3>
+                      <AddQuestionPaperForm
+                        courseId={course.id}
+                        onPaperAdded={handlePaperAdded}
+                        onClose={() => setShowAddPaper(false)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </motion.div>
+
+          {/* Resource Viewer Modal */}
+          <AnimatePresence>
+            {viewingResource && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="w-full max-w-6xl h-[85vh] bg-slate-900 border border-cyan-500/30 rounded-sm shadow-2xl relative flex flex-col"
+                >
+                  <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-900/95">
+                    <h3 className="text-lg font-bold text-cyan-400 uppercase tracking-widest truncate pr-4">
+                      {viewingResource.title}
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <a 
+                        href={viewingResource.file_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="p-2 text-slate-400 hover:text-cyan-400 transition-colors"
+                        title="Open in New Tab"
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </a>
+                      <button 
+                        onClick={() => setViewingResource(null)}
+                        className="p-2 text-slate-400 hover:text-red-400 transition-colors"
+                      >
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex-1 bg-slate-950 relative">
+                    <iframe 
+                      src={getGoogleDriveEmbedUrl(viewingResource.file_url)}
+                      className="w-full h-full border-0"
+                      allow="autoplay"
+                      title="Resource Viewer"
+                    />
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
     </div>

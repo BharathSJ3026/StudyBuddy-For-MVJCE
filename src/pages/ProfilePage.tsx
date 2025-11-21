@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, BookOpen, Clock, Edit, Save, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -16,36 +17,74 @@ interface UserProfile {
   joined_at: string;
 }
 
+interface Department {
+  id: string;
+  name: string;
+}
+
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [departments, setDepartments] = useState<Department[]>([]);
   
   const { user } = useAuth();
   const { supabase } = useSupabase();
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      const { data } = await supabase.from('departments').select('*');
+      if (data) setDepartments(data);
+    };
+    fetchDepartments();
+  }, [supabase]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return;
       
       try {
-        // Simulate data loading since Supabase isn't connected yet
-        setTimeout(() => {
-          // Mock profile data
+        setIsLoading(true);
+        
+        const { data, error } = await supabase
+          .from('profiles')
+          .select(`
+            *,
+            departments (
+              name
+            )
+          `)
+          .eq('id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+
+        if (data) {
           setProfile({
-            username: user.user_metadata?.username || 'MVJCE Student',
+            username: data.username || user.user_metadata?.username || 'Student',
             email: user.email || '',
-            department: 'Computer Science',
-            semester: 4,
-            bio: 'Engineering student at MVJCE with interests in AI, web development, and algorithms.',
-            joined_at: new Date(user.created_at || Date.now()).toISOString()
+            department: data.departments?.name || 'General',
+            semester: data.semester || 1,
+            bio: data.bio || '',
+            joined_at: data.created_at
           });
-          
-          setIsLoading(false);
-        }, 1000);
+        } else {
+          setProfile({
+            username: user.user_metadata?.username || 'Student',
+            email: user.email || '',
+            department: 'General',
+            semester: 1,
+            bio: '',
+            joined_at: new Date().toISOString()
+          });
+        }
       } catch (error) {
         console.error('Error fetching user profile:', error);
+        toast.error('Failed to load profile');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -69,16 +108,37 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!profile) return;
+    if (!user) return;
     
-    // In a real implementation, this would be a Supabase call
-    setProfile({
-      ...profile,
-      ...editedProfile
-    });
-    
-    setIsEditing(false);
-    setEditedProfile({});
+    try {
+      // Find department ID
+      const selectedDept = departments.find(d => d.name === editedProfile.department);
+      
+      const updates = {
+        username: editedProfile.username,
+        department_id: selectedDept?.id,
+        semester: editedProfile.semester,
+        bio: editedProfile.bio,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...updates
+        });
+
+      if (error) throw error;
+
+      setProfile(prev => prev ? ({ ...prev, ...editedProfile }) : null);
+      setIsEditing(false);
+      setEditedProfile({});
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile');
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -229,11 +289,20 @@ const ProfilePage: React.FC = () => {
                             onChange={(e) => setEditedProfile({...editedProfile, department: e.target.value})}
                             className="w-full bg-slate-950 border border-slate-700 text-slate-300 px-3 py-2 rounded-sm focus:outline-none focus:border-cyan-500 font-mono text-sm"
                           >
-                            <option value="Computer Science">Computer Science</option>
-                            <option value="Information Science">Information Science</option>
-                            <option value="Mechanical Engineering">Mechanical Engineering</option>
-                            <option value="Civil Engineering">Civil Engineering</option>
-                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="">Select Department</option>
+                            {departments.length > 0 ? (
+                              departments.map(dept => (
+                                <option key={dept.id} value={dept.name}>{dept.name}</option>
+                              ))
+                            ) : (
+                              <>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Science">Information Science</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Electrical Engineering">Electrical Engineering</option>
+                              </>
+                            )}
                           </select>
                         ) : (
                           <div className="flex items-center bg-slate-950 border border-slate-800 px-4 py-3 rounded-sm text-slate-300">

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Book } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Book, Plus, X, ExternalLink, ArrowLeft } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 interface Course {
   id: string;
@@ -12,6 +14,7 @@ interface Course {
   code: string;
   semester: number;
   instructor: string;
+  resource_link?: string;
 }
 
 interface Department {
@@ -21,39 +24,52 @@ interface Department {
 }
 
 const DepartmentPage: React.FC = () => {
-  const { departmentId } = useParams<{ departmentId: string }>();
+  const { departmentName } = useParams<{ departmentName: string }>();
+  const navigate = useNavigate();
   const [department, setDepartment] = useState<Department | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [currentSemester, setCurrentSemester] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddCourseModal, setShowAddCourseModal] = useState(false);
+  const [newCourse, setNewCourse] = useState({
+    name: '',
+    code: '',
+    description: '',
+    instructor: ''
+  });
   
   const { supabase } = useSupabase();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
         setIsLoading(true);
 
-        // Fetch department details
+        if (!departmentName) return;
+
+        // Fetch department details by name
         const { data: deptData, error: deptError } = await supabase
           .from('departments')
           .select('*')
-          .eq('id', departmentId)
+          .eq('name', decodeURIComponent(departmentName))
           .single();
 
         if (deptError) throw deptError;
         setDepartment(deptData);
 
-        // Fetch courses for this department
-        const { data: courseData, error: courseError } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('department_id', departmentId)
-          .order('semester', { ascending: true })
-          .order('name', { ascending: true });
+        // Fetch courses for this department using the fetched ID
+        if (deptData) {
+          const { data: courseData, error: courseError } = await supabase
+            .from('courses')
+            .select('*')
+            .eq('department_id', deptData.id)
+            .order('semester', { ascending: true })
+            .order('name', { ascending: true });
 
-        if (courseError) throw courseError;
-        setCourses(courseData || []);
+          if (courseError) throw courseError;
+          setCourses(courseData || []);
+        }
 
       } catch (error) {
         console.error('Error fetching department:', error);
@@ -62,10 +78,47 @@ const DepartmentPage: React.FC = () => {
       }
     };
 
-    if (departmentId) {
+    if (departmentName) {
       fetchDepartment();
     }
-  }, [departmentId, supabase]);
+  }, [departmentName, supabase]);
+
+  const handleAddCourse = async () => {
+    if (!newCourse.name || !newCourse.code || !department?.id) {
+      toast.error('Please fill in required fields');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .insert({
+          department_id: department.id,
+          name: newCourse.name,
+          code: newCourse.code,
+          description: newCourse.description,
+          semester: currentSemester,
+          instructor: newCourse.instructor
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setCourses([...courses, data]);
+      setShowAddCourseModal(false);
+      setNewCourse({
+        name: '',
+        code: '',
+        description: '',
+        instructor: ''
+      });
+      toast.success('Course added successfully');
+    } catch (error) {
+      console.error('Error adding course:', error);
+      toast.error('Failed to add course');
+    }
+  };
 
   const filteredCourses = courses.filter(course => course.semester === currentSemester);
 
@@ -122,6 +175,14 @@ const DepartmentPage: React.FC = () => {
             animate="visible"
             className="max-w-6xl mx-auto"
           >
+            <button 
+              onClick={() => navigate(-1)} 
+              className="flex items-center text-cyan-500 hover:text-cyan-400 mb-6 transition-colors uppercase tracking-widest text-xs font-bold"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              BACK TO DEPARTMENTS
+            </button>
+
             {department && (
               <motion.div variants={itemVariants} className="bg-slate-900/80 border border-slate-800 rounded-sm p-6 mb-8 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
@@ -131,10 +192,22 @@ const DepartmentPage: React.FC = () => {
             )}
 
             <motion.div variants={itemVariants} className="mb-8">
-              <div className="flex items-center mb-4">
-                <div className="h-px flex-1 bg-slate-800"></div>
-                <span className="px-4 text-xs font-bold text-cyan-500 uppercase tracking-widest">SELECT SEMESTER MODULE</span>
-                <div className="h-px flex-1 bg-slate-800"></div>
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center flex-1">
+                  <div className="h-px flex-1 bg-slate-800"></div>
+                  <span className="px-4 text-xs font-bold text-cyan-500 uppercase tracking-widest">SELECT SEMESTER MODULE</span>
+                  <div className="h-px flex-1 bg-slate-800"></div>
+                </div>
+                
+                {user && (
+                  <button
+                    onClick={() => setShowAddCourseModal(true)}
+                    className="ml-4 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold py-2 px-4 rounded-sm flex items-center uppercase tracking-wider transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    ADD COURSE
+                  </button>
+                )}
               </div>
               
               <div className="flex flex-wrap gap-2 justify-center">
@@ -182,6 +255,7 @@ const DepartmentPage: React.FC = () => {
                       </div>
                     </div>
                     
+                    {/* Access Resources Button */}
                     <Link
                       to={`/resource/${course.id}`}
                       className="w-full bg-slate-950 border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 font-bold py-3 px-4 rounded-sm flex items-center justify-center uppercase tracking-widest text-xs transition-all group-hover:shadow-[0_0_10px_rgba(0,0,0,0.3)]"
@@ -200,9 +274,106 @@ const DepartmentPage: React.FC = () => {
                   <Book className="w-8 h-8 text-slate-600" />
                 </div>
                 <p className="text-slate-500 text-lg uppercase tracking-widest">NO COURSE DATA FOUND FOR SEMESTER {currentSemester}</p>
+                {user && (
+                  <button
+                    onClick={() => setShowAddCourseModal(true)}
+                    className="mt-4 text-cyan-500 hover:text-cyan-400 text-xs font-bold uppercase tracking-widest"
+                  >
+                    ADD FIRST COURSE
+                  </button>
+                )}
               </div>
             )}
           </motion.div>
+
+          {/* Add Course Modal */}
+          <AnimatePresence>
+            {showAddCourseModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="w-full max-w-lg bg-slate-900 border border-cyan-500/30 rounded-sm shadow-2xl relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest">Add New Course</h2>
+                      <button 
+                        onClick={() => setShowAddCourseModal(false)}
+                        className="text-slate-500 hover:text-white transition-colors"
+                      >
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Course Name</label>
+                        <input
+                          type="text"
+                          value={newCourse.name}
+                          onChange={(e) => setNewCourse({...newCourse, name: e.target.value})}
+                          placeholder="e.g. Database Management Systems"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Course Code</label>
+                          <input
+                            type="text"
+                            value={newCourse.code}
+                            onChange={(e) => setNewCourse({...newCourse, code: e.target.value})}
+                            placeholder="e.g. 18CS53"
+                            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Semester</label>
+                          <div className="px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm text-slate-500 text-sm font-mono">
+                            SEMESTER {currentSemester}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Instructor Name</label>
+                        <input
+                          type="text"
+                          value={newCourse.instructor}
+                          onChange={(e) => setNewCourse({...newCourse, instructor: e.target.value})}
+                          placeholder="e.g. Dr. Smith"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Description</label>
+                        <textarea
+                          value={newCourse.description}
+                          onChange={(e) => setNewCourse({...newCourse, description: e.target.value})}
+                          placeholder="Brief description of the course..."
+                          rows={3}
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-sm focus:outline-none focus:border-cyan-500 text-slate-300 text-sm font-mono resize-none"
+                        />
+                      </div>
+
+                      <button
+                        onClick={handleAddCourse}
+                        disabled={!newCourse.name || !newCourse.code}
+                        className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-sm transition-all uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(6,182,212,0.3)] mt-2"
+                      >
+                        ADD COURSE TO DATABASE
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
     </div>

@@ -111,7 +111,7 @@ const DepartmentsListPage: React.FC = () => {
           >
             {departments.map((dept) => (
               <motion.div key={dept.id} variants={itemVariants}>
-                <Link to={`/department/${dept.id}`}>
+                <Link to={`/department/${encodeURIComponent(dept.name)}`}>
                   <div className="bg-slate-900/50 border border-slate-800 rounded-sm p-6 hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden">
                     {/* Hover background effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
