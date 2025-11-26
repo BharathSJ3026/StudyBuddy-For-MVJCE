@@ -15,6 +15,7 @@ import QuizGeneratorPage from './pages/QuizGeneratorPage';
 import DiscussionPage from './pages/DiscussionPage';
 import SchedulePage from './pages/SchedulePage';
 import ProfilePage from './pages/ProfilePage';
+import ResearchScholarPage from './pages/ResearchScholarPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Components
@@ -93,6 +94,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SchedulePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/research"
+              element={
+                <ProtectedRoute>
+                  <ResearchScholarPage />
                 </ProtectedRoute>
               }
             />

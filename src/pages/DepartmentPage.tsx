@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Book, Plus, X, ExternalLink, ArrowLeft } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
+import Sidebar from '../components/layout/Sidebar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -168,9 +169,15 @@ const DepartmentPage: React.FC = () => {
 
       <div className="relative z-10">
         <Navbar />
-        <main className="container mx-auto px-4 py-8 pt-36">
-          <motion.div
-            variants={containerVariants}
+        
+        <div className="flex h-screen">
+          <div className="hidden md:block h-full">
+            <Sidebar />
+          </div>
+          
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-24 md:pt-24">
+            <motion.div
+              variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="max-w-6xl mx-auto"
@@ -375,6 +382,7 @@ const DepartmentPage: React.FC = () => {
             )}
           </AnimatePresence>
         </main>
+        </div>
       </div>
     </div>
   );
