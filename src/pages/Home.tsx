@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -6,6 +6,23 @@ import { Book, GraduationCap, Users, Calendar, BookOpen, ArrowRight, Sparkles } 
 
 const Home: React.FC = () => {
   const { user } = useAuth();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleEnded = () => {
+      // Pause for 3 seconds at the end, then restart
+      setTimeout(() => {
+        video.currentTime = 0;
+        video.play();
+      }, 3000);
+    };
+
+    video.addEventListener('ended', handleEnded);
+    return () => video.removeEventListener('ended', handleEnded);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -56,14 +73,14 @@ const Home: React.FC = () => {
       {/* --- Background Video --- */}
       <div className="fixed inset-0 z-0">
         <video
+          ref={videoRef}
           autoPlay
-          loop
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
           style={{ filter: 'brightness(0.7) contrast(1.1)' }}
         >
-          <source src="/dithered-video(1).webm" type="video/webm" />
+          <source src="/dithered-video.mp4" type="video/mp4" />
         </video>
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#030712]/60 via-[#030712]/40 to-[#030712]/80 pointer-events-none" />
