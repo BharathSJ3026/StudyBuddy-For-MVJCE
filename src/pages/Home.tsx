@@ -2,210 +2,202 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { Book, GraduationCap, Users, Calendar, BookOpen } from 'lucide-react';
+import { Book, GraduationCap, Users, Calendar, BookOpen, ArrowRight, Sparkles } from 'lucide-react';
 
 const Home: React.FC = () => {
   const { user } = useAuth();
 
-  const heroVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        duration: 0.6,
-        when: "beforeChildren",
-        staggerChildren: 0.2
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.2
       }
     }
   };
-  
+
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.5 }
+      transition: { type: "spring", stiffness: 50, damping: 20 }
     }
   };
 
   const features = [
     {
-      icon: <BookOpen className="w-10 h-10 text-primary" />,
+      icon: <BookOpen className="w-6 h-6 text-indigo-400" />,
       title: "Study Resources",
-      description: "Access comprehensive study materials, lecture notes, and guides organized by department and semester."
+      description: "Curated lecture notes and comprehensive guides organized by department."
     },
     {
-      icon: <Users className="w-10 h-10 text-primary" />,
-      title: "Discussion Forums",
-      description: "Connect with fellow students, ask questions, and participate in academic discussions."
+      icon: <Users className="w-6 h-6 text-rose-400" />,
+      title: "Community Forums",
+      description: "Connect with peers, discuss topics, and solve academic challenges together."
     },
     {
-      icon: <Calendar className="w-10 h-10 text-primary" />,
-      title: "Schedule Planner",
-      description: "Organize your academic schedule, set reminders for exams, and manage your study time efficiently."
+      icon: <Calendar className="w-6 h-6 text-emerald-400" />,
+      title: "Smart Schedule",
+      description: "Automated planning for your classes, exams, and study sessions."
     },
     {
-      icon: <GraduationCap className="w-10 h-10 text-primary" />,
-      title: "Previous Papers",
-      description: "Practice with previous year question papers and improve your exam preparation strategy."
+      icon: <GraduationCap className="w-6 h-6 text-amber-400" />,
+      title: "Exam Prep",
+      description: "Access a vast library of previous year question papers and solutions."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30">
-      {/* Cyber Grid Background */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
-           style={{ 
-             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
-             backgroundSize: '40px 40px' 
-           }}>
-      </div>
+    <div className="min-h-screen bg-[#030712] text-slate-200 font-sans selection:bg-indigo-500/30 relative overflow-hidden">
       
-      {/* Scanline Effect */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
+      {/* --- Background Video --- */}
+      <div className="fixed inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: 'brightness(0.7) contrast(1.1)' }}
+        >
+          <source src="/dithered-video(1).webm" type="video/webm" />
+        </video>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#030712]/60 via-[#030712]/40 to-[#030712]/80 pointer-events-none" />
+        {/* Grain Texture overlay */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+      </div>
 
-      {/* Hero Section */}
+      {/* --- Navbar Spacer (Optional if you have a fixed nav) --- */}
+      <div className="h-16"></div>
+
+      {/* --- Hero Section --- */}
       <motion.section 
-        className="relative py-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-screen z-10"
-        variants={heroVariants}
+        className="relative z-10 pt-20 pb-32 px-6 max-w-7xl mx-auto flex flex-col items-center text-center"
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div variants={itemVariants} className="flex justify-center mb-8">
-            <div className="rounded-sm border border-cyan-500/50 bg-slate-900/80 p-4 shadow-[0_0_15px_rgba(6,182,212,0.3)] relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
-              <Book className="h-12 w-12 text-cyan-400" />
-            </div>
-          </motion.div>
-          
-          <motion.h1 
-            variants={itemVariants}
-            className="text-4xl md:text-6xl font-bold mb-6 text-white tracking-tight glitch-text"
-            data-text="Study Buddy"
-          >
-            Study Buddy
-          </motion.h1>
-          
-          <motion.h2 
-            variants={itemVariants}
-            className="text-2xl md:text-3xl font-semibold mb-6 text-cyan-400 uppercase tracking-widest"
-          >
-            Your Ultimate Learning Companion at MVJCE
-          </motion.h2>
-          
-          <motion.p 
-            variants={itemVariants}
-            className="text-lg text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed"
-          >
-            Access study materials, connect with peers, plan your schedule, and excel in your engineering journey with StudyBuddy.
-          </motion.p>
-          
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
-            {user ? (
-              <Link 
-                to="/dashboard" 
-                className="bg-cyan-600 hover:bg-cyan-500 text-white text-lg px-8 py-3 font-bold uppercase tracking-widest rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-              >
-                Go to Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link 
-                  to="/login" 
-                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-lg px-8 py-3 font-bold uppercase tracking-widest rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="border border-cyan-500 text-cyan-400 hover:bg-cyan-950 text-lg px-8 py-3 font-bold uppercase tracking-widest rounded-sm transition-all"
-                >
-                  Create Account
-                </Link>
-              </>
-            )}
-          </motion.div>
-        </div>
-      </motion.section>
+        {/* Badge */}
+        <motion.div variants={itemVariants} className="mb-8">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-400 backdrop-blur-md">
+            <Sparkles className="w-3 h-3 text-indigo-400" />
+            <span>Exclusively for MVJCE Students</span>
+          </span>
+        </motion.div>
 
-      {/* Features Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-900/50 border-y border-slate-800 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-white uppercase tracking-wider">Everything You Need to Excel</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              StudyBuddy brings together all the tools and resources MVJCE students need to succeed in their academic journey.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                className="bg-slate-950 border border-slate-800 rounded-sm p-6 text-center hover:border-cyan-500/50 transition-all group relative overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-slate-800 group-hover:bg-cyan-500 transition-colors"></div>
-                <div className="flex justify-center mb-4">
-                  <div className="text-cyan-500 group-hover:text-cyan-400 transition-colors drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]">
-                    {React.cloneElement(feature.icon as React.ReactElement, { className: "w-10 h-10" })}
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-slate-200 group-hover:text-cyan-400 transition-colors uppercase tracking-wide">{feature.title}</h3>
-                <p className="text-slate-500 text-sm">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="absolute inset-0 bg-cyan-900/10 pointer-events-none"></div>
-        <div className="max-w-5xl mx-auto text-center relative">
-          <h2 className="text-3xl font-bold mb-6 text-white uppercase tracking-wider">Ready to Transform Your Learning Experience?</h2>
-          <p className="text-slate-400 text-lg mb-8 max-w-3xl mx-auto">
-            Join StudyBuddy today and gain access to a comprehensive platform designed specifically for MVJCE students.
-          </p>
-          
+        {/* Main Heading with Gradient Grey */}
+        <motion.h1 
+          variants={itemVariants}
+          className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 max-w-4xl"
+        >
+          <span className="bg-gradient-to-b from-white via-slate-200 to-slate-500 bg-clip-text text-transparent drop-shadow-sm">
+            Master Your
+          </span>
+          <br />
+          <span className="bg-gradient-to-b from-slate-100 via-slate-300 to-slate-600 bg-clip-text text-transparent">
+            Engineering Journey
+          </span>
+        </motion.h1>
+        
+        {/* Subtext */}
+        <motion.p 
+          variants={itemVariants}
+          className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
+        >
+          StudyBuddy is the all-in-one academic ecosystem designed to help you organize, collaborate, and excel at <span className="text-slate-200 font-medium">MVJ College of Engineering</span>.
+        </motion.p>
+        
+        {/* Buttons */}
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full sm:w-auto">
           {user ? (
             <Link 
               to="/dashboard" 
-              className="bg-cyan-600 hover:bg-cyan-500 text-white text-lg px-8 py-3 font-bold uppercase tracking-widest rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] inline-block"
+              className="group relative inline-flex items-center gap-2 bg-slate-100 text-slate-900 px-8 py-3.5 rounded-lg font-semibold hover:bg-white transition-all shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] hover:scale-[1.02]"
             >
               Go to Dashboard
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           ) : (
-            <Link 
-              to="/register" 
-              className="bg-cyan-600 hover:bg-cyan-500 text-white text-lg px-8 py-3 font-bold uppercase tracking-widest rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] inline-block"
+            <>
+              <Link 
+                to="/register" 
+                className="group relative inline-flex items-center gap-2 bg-slate-100 text-slate-900 px-8 py-3.5 rounded-lg font-semibold hover:bg-white transition-all shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] hover:scale-[1.02]"
+              >
+                Get Started
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link 
+                to="/login" 
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-slate-300 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all backdrop-blur-sm"
+              >
+                Sign In
+              </Link>
+            </>
+          )}
+        </motion.div>
+      </motion.section>
+
+      {/* --- Features Grid --- */}
+      <section className="relative z-10 px-6 pb-32 max-w-7xl mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {features.map((feature, index) => (
+            <div 
+              key={index}
+              className="group p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.1] hover:bg-white/[0.05] backdrop-blur-sm transition-all duration-300 flex flex-col h-full"
             >
-              Get Started Now
-            </Link>
+              <div className="mb-4 p-3 rounded-xl bg-white/[0.05] w-fit group-hover:scale-110 transition-transform duration-300">
+                {feature.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-slate-200 mb-2">{feature.title}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">{feature.description}</p>
+            </div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* --- Bottom CTA --- */}
+      <section className="relative z-10 py-24 px-6 border-t border-white/[0.05]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent">
+            Ready to elevate your grades?
+          </h2>
+          <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
+            Join hundreds of MVJCE students utilizing StudyBuddy to streamline their academic workflow.
+          </p>
+          {!user && (
+             <Link 
+             to="/register" 
+             className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-indigo-500/25"
+           >
+             Create Free Account
+           </Link>
           )}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-950 border-t border-slate-800 py-8 px-4 relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center mb-4 md:mb-0">
-            <div className="border border-cyan-500/30 bg-slate-900 p-2 mr-2 rounded-sm">
-              <Book className="h-6 w-6 text-cyan-400" />
-            </div>
-            <span className="font-bold text-lg text-slate-200 tracking-wider uppercase">StudyBuddy</span>
+      {/* --- Minimal Footer --- */}
+      <footer className="relative z-10 py-8 border-t border-white/[0.05] bg-[#020610]">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2 text-slate-300">
+            <Book className="h-5 w-5" />
+            <span className="font-bold tracking-tight">StudyBuddy</span>
           </div>
-          
-          <div className="text-slate-600 text-sm font-mono">
-            &copy; {new Date().getFullYear()} StudyBuddy for MVJCE. All rights reserved.
+          <div className="text-slate-600 text-xs font-mono">
+            © {new Date().getFullYear()} StudyBuddy • MVJCE
           </div>
         </div>
       </footer>
+
     </div>
   );
 };
