@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Book, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import DitherWave from '../components/ui/DitherWave';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');

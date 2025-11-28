@@ -5,6 +5,7 @@ import { Book, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import DitherWave from '../components/ui/DitherWave';
 import TechButton from '../components/ui/TechButton';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
