@@ -155,7 +155,7 @@ const ResearchScholarPage: React.FC = () => {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="ENTER_SEARCH_QUERY..."
+                  placeholder=" ENTER_SEARCH_QUERY..."
                   className="w-full py-3 bg-transparent border-none text-cyan-400 placeholder-cyan-900/50 focus:outline-none focus:ring-0 font-mono tracking-wider text-lg"
                   autoComplete="off"
                   spellCheck="false"

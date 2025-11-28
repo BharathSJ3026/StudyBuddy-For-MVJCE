@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Book, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import DitherWave from '../components/ui/DitherWave';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -52,16 +52,8 @@ const Register: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30 p-4">
-      {/* Cyber Grid Background */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
-           style={{ 
-             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
-             backgroundSize: '40px 40px' 
-           }}>
-      </div>
-      
-      {/* Scanline Effect */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
+      {/* Dither Wave Background */}
+      <DitherWave color="#06b6d4" />
 
       <div className="w-full max-w-md relative z-10">
         <motion.div

@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Book, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import DitherWave from '../components/ui/DitherWave';
+import TechButton from '../components/ui/TechButton';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -45,16 +46,8 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-200 font-mono relative overflow-hidden selection:bg-cyan-500/30 p-4">
-      {/* Cyber Grid Background */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
-           style={{ 
-             backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', 
-             backgroundSize: '40px 40px' 
-           }}>
-      </div>
-      
-      {/* Scanline Effect */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10"></div>
+      {/* Dither Wave Background */}
+      <DitherWave color="#06b6d4" />
 
       <div className="w-full max-w-md relative z-10">
         <motion.div
@@ -143,14 +136,15 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <button
+            <TechButton
               type="submit"
+              variant="neon-blue"
               disabled={isLoading}
-              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-sm flex items-center justify-center uppercase tracking-widest text-sm transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full"
             >
               {isLoading ? <LoadingSpinner size="small" className="mr-2" /> : null}
               {isLoading ? 'AUTHENTICATING...' : 'LOGIN'}
-            </button>
+            </TechButton>
           </form>
 
           <div className="mt-6 text-center">

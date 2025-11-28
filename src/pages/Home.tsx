@@ -2,7 +2,8 @@ import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { Book, GraduationCap, Users, Calendar, BookOpen, ArrowRight, Sparkles } from 'lucide-react';
+import { Book, GraduationCap, Users, Calendar, BookOpen, ArrowRight, Sparkles, ArrowUpRight } from 'lucide-react';
+import TechButton from '../components/ui/TechButton';
 
 const Home: React.FC = () => {
   const { user } = useAuth();
@@ -78,12 +79,12 @@ const Home: React.FC = () => {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: 'brightness(0.7) contrast(1.1)' }}
+          style={{ filter: 'brightness(0.8) contrast(1.5)' }}
         >
           <source src="/dithered-video.mp4" type="video/mp4" />
         </video>
         {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#030712]/60 via-[#030712]/40 to-[#030712]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#030712]/80 via-[#030712]/60 to-[#030712]/90 pointer-events-none" />
         {/* Grain Texture overlay */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       </div>
@@ -109,13 +110,13 @@ const Home: React.FC = () => {
         {/* Main Heading with Gradient Grey */}
         <motion.h1 
           variants={itemVariants}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 max-w-4xl"
+          className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 max-w-4xl drop-shadow-2xl"
         >
-          <span className="bg-gradient-to-b from-white via-slate-200 to-slate-500 bg-clip-text text-transparent drop-shadow-sm">
+          <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent drop-shadow-lg">
             Master Your
           </span>
           <br />
-          <span className="bg-gradient-to-b from-slate-100 via-slate-300 to-slate-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-b from-slate-50 via-slate-200 to-slate-500 bg-clip-text text-transparent drop-shadow-lg">
             Engineering Journey
           </span>
         </motion.h1>
@@ -123,36 +124,25 @@ const Home: React.FC = () => {
         {/* Subtext */}
         <motion.p 
           variants={itemVariants}
-          className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
+          className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-light drop-shadow-md"
         >
-          StudyBuddy is the all-in-one academic ecosystem designed to help you organize, collaborate, and excel at <span className="text-slate-200 font-medium">MVJ College of Engineering</span>.
+          StudyBuddy is the all-in-one academic ecosystem designed to help you organize, collaborate, and excel at <span className="text-white font-medium drop-shadow-md">MVJ College of Engineering</span>.
         </motion.p>
         
         {/* Buttons */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full sm:w-auto">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full sm:w-auto">
           {user ? (
-            <Link 
-              to="/dashboard" 
-              className="group relative inline-flex items-center gap-2 bg-slate-100 text-slate-900 px-8 py-3.5 rounded-lg font-semibold hover:bg-white transition-all shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] hover:scale-[1.02]"
-            >
-              Go to Dashboard
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <TechButton to="/dashboard" variant="primary">
+              DASHBOARD_ACCESS <ArrowUpRight className="w-4 h-4" />
+            </TechButton>
           ) : (
             <>
-              <Link 
-                to="/register" 
-                className="group relative inline-flex items-center gap-2 bg-slate-100 text-slate-900 px-8 py-3.5 rounded-lg font-semibold hover:bg-white transition-all shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] hover:scale-[1.02]"
-              >
-                Get Started
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link 
-                to="/login" 
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-slate-300 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all backdrop-blur-sm"
-              >
-                Sign In
-              </Link>
+              <TechButton to="/register" variant="primary">
+                REGISTER <ArrowUpRight className="w-4 h-4" />
+              </TechButton>
+              <TechButton to="/login" variant="secondary">
+                LOGIN_PORTAL
+              </TechButton>
             </>
           )}
         </motion.div>
@@ -192,12 +182,11 @@ const Home: React.FC = () => {
             Join hundreds of MVJCE students utilizing StudyBuddy to streamline their academic workflow.
           </p>
           {!user && (
-             <Link 
-             to="/register" 
-             className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-indigo-500/25"
-           >
-             Create Free Account
-           </Link>
+            <div className="flex justify-center">
+              <TechButton to="/register" variant="primary">
+                CREATE_ACCOUNT <ArrowUpRight className="w-4 h-4" />
+              </TechButton>
+            </div>
           )}
         </div>
       </section>
